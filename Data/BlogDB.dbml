@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="BlogDB" Class="BlogDBDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Table Name="dbo.Category" Member="Categories">
+    <Type Name="Category">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="parentId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="title" Type="System.String" DbType="VarChar(75) NOT NULL" CanBeNull="false" />
+      <Column Name="metaTitle" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="slug" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="content" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Association Name="Category_Category" Member="Categories" ThisKey="id" OtherKey="parentId" Type="Category" />
+      <Association Name="Category_PostCategory" Member="PostCategories" ThisKey="id" OtherKey="categoryId" Type="PostCategory" />
+      <Association Name="Category_Category" Member="Category1" ThisKey="parentId" OtherKey="id" Type="Category" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Comment" Member="Comments">
+    <Type Name="Comment">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="postId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="parentId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="title" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="published" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="createdAt" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="publishedAt" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="content" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Association Name="Comment_Comment" Member="Comments" ThisKey="id" OtherKey="parentId" Type="Comment" />
+      <Association Name="Comment_Comment" Member="Comment1" ThisKey="parentId" OtherKey="id" Type="Comment" IsForeignKey="true" />
+      <Association Name="Post_Comment" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Post" Member="Posts">
+    <Type Name="Post">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="authorId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="parentId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="title" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="metaTitle" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="slug" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="summary" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="published" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="createdAt" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="updatedAt" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="publishedAt" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="content" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Association Name="Post_Comment" Member="Comments" ThisKey="id" OtherKey="postId" Type="Comment" />
+      <Association Name="Post_Post" Member="Posts" ThisKey="id" OtherKey="parentId" Type="Post" />
+      <Association Name="Post_PostCategory" Member="PostCategories" ThisKey="id" OtherKey="postId" Type="PostCategory" />
+      <Association Name="Post_PostTag" Member="PostTags" ThisKey="id" OtherKey="postId" Type="PostTag" />
+      <Association Name="Post_Post" Member="Post1" ThisKey="parentId" OtherKey="id" Type="Post" IsForeignKey="true" />
+      <Association Name="User_Post" Member="User" ThisKey="authorId" OtherKey="id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PostCategory" Member="PostCategories">
+    <Type Name="PostCategory">
+      <Column Name="postId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="categoryId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Association Name="Category_PostCategory" Member="Category" ThisKey="categoryId" OtherKey="id" Type="Category" IsForeignKey="true" />
+      <Association Name="Post_PostCategory" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PostTag" Member="PostTags">
+    <Type Name="PostTag">
+      <Column Name="postId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="tagId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Association Name="Post_PostTag" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" />
+      <Association Name="Tag_PostTag" Member="Tag" ThisKey="tagId" OtherKey="id" Type="Tag" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Tag" Member="Tags">
+    <Type Name="Tag">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="title" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="metaTitle" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="slug" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="content" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Association Name="Tag_PostTag" Member="PostTags" ThisKey="id" OtherKey="tagId" Type="PostTag" />
+    </Type>
+  </Table>
+  <Table Name="dbo.[User]" Member="Users">
+    <Type Name="User">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="firstName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="middleName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="lastName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="email" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="passwordHash" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="registeredAt" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="lastLogin" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="intro" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="profile" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="admin" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="User_Post" Member="Posts" ThisKey="id" OtherKey="authorId" Type="Post" />
+    </Type>
+  </Table>
+</Database>
