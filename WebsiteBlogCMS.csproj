@@ -96,9 +96,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\demo\chart-area-demo.js" />
+    <Content Include="assets\demo\chart-bar-demo.js" />
+    <Content Include="assets\demo\chart-pie-demo.js" />
+    <Content Include="assets\demo\datatables-demo.js" />
+    <Content Include="assets\img\error-404-monochrome.svg" />
     <Content Include="Content\bootstrap-chosen.css" />
     <Content Include="Content\chosen-sprite%402x.png" />
     <Content Include="Content\chosen-sprite.png" />
+    <Content Include="css\style-adminpanel.css" />
     <Content Include="css\style-liberty.css" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
@@ -138,8 +144,10 @@
     <Content Include="images\trending1.jpg" />
     <Content Include="images\trending2.jpg" />
     <Content Include="js\bootstrap.min.js" />
+    <Content Include="js\datatables-simple-demo.js" />
     <Content Include="js\jquery-3.3.1.min.js" />
     <Content Include="js\owl.carousel.js" />
+    <Content Include="js\scripts.js" />
     <Content Include="js\theme-change.js" />
     <Content Include="Content\bootstrap-chosen.scss" />
     <Content Include="Content\bootstrap-chosen.less" />
@@ -148,6 +156,17 @@
     <Content Include="Scripts\chosen.jquery.min.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />
+    <Content Include="Views\Admin\401.html" />
+    <Content Include="Views\Admin\404.html" />
+    <Content Include="Views\Admin\500.html" />
+    <Content Include="Views\Admin\charts.html" />
+    <Content Include="Views\Admin\index.html" />
+    <Content Include="Views\Admin\layout-sidenav-light.html" />
+    <Content Include="Views\Admin\layout-static.html" />
+    <Content Include="Views\Admin\login.html" />
+    <Content Include="Views\Admin\password.html" />
+    <Content Include="Views\Admin\register.html" />
+    <Content Include="Views\Admin\tables.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +174,7 @@
     <Compile Include="Classes\DbHelper.cs" />
     <Compile Include="Classes\Enums.cs" />
     <Compile Include="Classes\ProgramVariables.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PostController.cs" />
@@ -210,6 +230,7 @@
     <Content Include="Views\User\Details.cshtml" />
     <Content Include="Views\User\Edit.cshtml" />
     <Content Include="Views\User\Delete.cshtml" />
+    <Content Include="Views\_AdminPanelLayoutPage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
