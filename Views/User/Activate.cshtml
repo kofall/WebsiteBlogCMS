@@ -1,0 +1,45 @@
+﻿@model WebsiteBlogCMS.Data.User
+@{
+    ViewBag.Title = "Activate";
+    Layout = "~/Views/_AccountLayoutPage.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header"><h3 class="text-center font-weight-light my-4">Aktywuj konto</h3></div>
+                <div class="card-body">
+                    @if(ViewBag.ErrorMessage != null)
+                    {
+                        <p class="text-center text-danger">@ViewBag.ErrorMessage</p>
+                    }
+                    @using (Html.BeginForm("Activate", "User", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        @Html.HiddenFor(model => model.id)
+                        @Html.Hidden("token", (object)ViewBag.Token)
+
+                        <div class="form-floating mb-3">
+                            @Html.EditorFor(model => model.login, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                            <label for="login">Login</label>
+                            @Html.ValidationMessageFor(model => model.login, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            @Html.EditorFor(model => model.passwordHash, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                            <label for="passwordHash">Hasło</label>
+                            @Html.ValidationMessageFor(model => model.passwordHash, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Aktywuj</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -51,6 +51,12 @@ namespace WebsiteBlogCMS.Data
     partial void InsertUser(User instance);
     partial void UpdateUser(User instance);
     partial void DeleteUser(User instance);
+    partial void InsertRole(Role instance);
+    partial void UpdateRole(Role instance);
+    partial void DeleteRole(Role instance);
+    partial void InsertUserToken(UserToken instance);
+    partial void UpdateUserToken(UserToken instance);
+    partial void DeleteUserToken(UserToken instance);
     #endregion
 		
 		public BlogDBDataContext(string connection) : 
@@ -132,6 +138,22 @@ namespace WebsiteBlogCMS.Data
 				return this.GetTable<User>();
 			}
 		}
+		
+		public System.Data.Linq.Table<Role> Roles
+		{
+			get
+			{
+				return this.GetTable<Role>();
+			}
+		}
+		
+		public System.Data.Linq.Table<UserToken> UserTokens
+		{
+			get
+			{
+				return this.GetTable<UserToken>();
+			}
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Category")]
@@ -145,10 +167,6 @@ namespace WebsiteBlogCMS.Data
 		private System.Nullable<int> _parentId;
 		
 		private string _title;
-		
-		private string _metaTitle;
-		
-		private string _slug;
 		
 		private string _content;
 		
@@ -168,10 +186,6 @@ namespace WebsiteBlogCMS.Data
     partial void OnparentIdChanged();
     partial void OntitleChanging(string value);
     partial void OntitleChanged();
-    partial void OnmetaTitleChanging(string value);
-    partial void OnmetaTitleChanged();
-    partial void OnslugChanging(string value);
-    partial void OnslugChanged();
     partial void OncontentChanging(string value);
     partial void OncontentChanged();
     #endregion
@@ -228,7 +242,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_title", DbType="VarChar(75) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_title", DbType="VarChar(100) NOT NULL", CanBeNull=false)]
 		public string title
 		{
 			get
@@ -248,47 +262,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_metaTitle", DbType="VarChar(100)")]
-		public string metaTitle
-		{
-			get
-			{
-				return this._metaTitle;
-			}
-			set
-			{
-				if ((this._metaTitle != value))
-				{
-					this.OnmetaTitleChanging(value);
-					this.SendPropertyChanging();
-					this._metaTitle = value;
-					this.SendPropertyChanged("metaTitle");
-					this.OnmetaTitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_slug", DbType="VarChar(100) NOT NULL", CanBeNull=false)]
-		public string slug
-		{
-			get
-			{
-				return this._slug;
-			}
-			set
-			{
-				if ((this._slug != value))
-				{
-					this.OnslugChanging(value);
-					this.SendPropertyChanging();
-					this._slug = value;
-					this.SendPropertyChanged("slug");
-					this.OnslugChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_content", DbType="NVarChar(MAX)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_content", DbType="VarChar(MAX) NOT NULL", CanBeNull=false)]
 		public string content
 		{
 			get
@@ -425,13 +399,13 @@ namespace WebsiteBlogCMS.Data
 		
 		private System.Nullable<int> _parentId;
 		
-		private string _title;
+		private System.Nullable<int> _authorId;
+		
+		private string _authorName;
 		
 		private bool _published;
 		
-		private System.DateTime _createdAt;
-		
-		private System.Nullable<System.DateTime> _publishedAt;
+		private System.DateTime _publishedAt;
 		
 		private string _content;
 		
@@ -440,6 +414,8 @@ namespace WebsiteBlogCMS.Data
 		private EntityRef<Comment> _Comment1;
 		
 		private EntityRef<Post> _Post;
+		
+		private EntityRef<User> _User;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -451,13 +427,13 @@ namespace WebsiteBlogCMS.Data
     partial void OnpostIdChanged();
     partial void OnparentIdChanging(System.Nullable<int> value);
     partial void OnparentIdChanged();
-    partial void OntitleChanging(string value);
-    partial void OntitleChanged();
+    partial void OnauthorIdChanging(System.Nullable<int> value);
+    partial void OnauthorIdChanged();
+    partial void OnauthorNameChanging(string value);
+    partial void OnauthorNameChanged();
     partial void OnpublishedChanging(bool value);
     partial void OnpublishedChanged();
-    partial void OncreatedAtChanging(System.DateTime value);
-    partial void OncreatedAtChanged();
-    partial void OnpublishedAtChanging(System.Nullable<System.DateTime> value);
+    partial void OnpublishedAtChanging(System.DateTime value);
     partial void OnpublishedAtChanged();
     partial void OncontentChanging(string value);
     partial void OncontentChanged();
@@ -468,6 +444,7 @@ namespace WebsiteBlogCMS.Data
 			this._Comments = new EntitySet<Comment>(new Action<Comment>(this.attach_Comments), new Action<Comment>(this.detach_Comments));
 			this._Comment1 = default(EntityRef<Comment>);
 			this._Post = default(EntityRef<Post>);
+			this._User = default(EntityRef<User>);
 			OnCreated();
 		}
 		
@@ -539,22 +516,46 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_title", DbType="VarChar(100) NOT NULL", CanBeNull=false)]
-		public string title
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_authorId", DbType="Int")]
+		public System.Nullable<int> authorId
 		{
 			get
 			{
-				return this._title;
+				return this._authorId;
 			}
 			set
 			{
-				if ((this._title != value))
+				if ((this._authorId != value))
 				{
-					this.OntitleChanging(value);
+					if (this._User.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnauthorIdChanging(value);
 					this.SendPropertyChanging();
-					this._title = value;
-					this.SendPropertyChanged("title");
-					this.OntitleChanged();
+					this._authorId = value;
+					this.SendPropertyChanged("authorId");
+					this.OnauthorIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_authorName", DbType="VarChar(100) NOT NULL", CanBeNull=false)]
+		public string authorName
+		{
+			get
+			{
+				return this._authorName;
+			}
+			set
+			{
+				if ((this._authorName != value))
+				{
+					this.OnauthorNameChanging(value);
+					this.SendPropertyChanging();
+					this._authorName = value;
+					this.SendPropertyChanged("authorName");
+					this.OnauthorNameChanged();
 				}
 			}
 		}
@@ -579,28 +580,8 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_createdAt", DbType="DateTime NOT NULL")]
-		public System.DateTime createdAt
-		{
-			get
-			{
-				return this._createdAt;
-			}
-			set
-			{
-				if ((this._createdAt != value))
-				{
-					this.OncreatedAtChanging(value);
-					this.SendPropertyChanging();
-					this._createdAt = value;
-					this.SendPropertyChanged("createdAt");
-					this.OncreatedAtChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_publishedAt", DbType="DateTime")]
-		public System.Nullable<System.DateTime> publishedAt
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_publishedAt", DbType="DateTime NOT NULL")]
+		public System.DateTime publishedAt
 		{
 			get
 			{
@@ -619,7 +600,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_content", DbType="NVarChar(MAX)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_content", DbType="VarChar(MAX) NOT NULL", CanBeNull=false)]
 		public string content
 		{
 			get
@@ -720,6 +701,40 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Comment", Storage="_User", ThisKey="authorId", OtherKey="id", IsForeignKey=true)]
+		public User User
+		{
+			get
+			{
+				return this._User.Entity;
+			}
+			set
+			{
+				User previousValue = this._User.Entity;
+				if (((previousValue != value) 
+							|| (this._User.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User.Entity = null;
+						previousValue.Comments.Remove(this);
+					}
+					this._User.Entity = value;
+					if ((value != null))
+					{
+						value.Comments.Add(this);
+						this._authorId = value.id;
+					}
+					else
+					{
+						this._authorId = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -763,15 +778,7 @@ namespace WebsiteBlogCMS.Data
 		
 		private int _authorId;
 		
-		private System.Nullable<int> _parentId;
-		
 		private string _title;
-		
-		private string _metaTitle;
-		
-		private string _slug;
-		
-		private string _summary;
 		
 		private bool _published;
 		
@@ -785,13 +792,9 @@ namespace WebsiteBlogCMS.Data
 		
 		private EntitySet<Comment> _Comments;
 		
-		private EntitySet<Post> _Posts;
-		
 		private EntitySet<PostCategory> _PostCategories;
 		
 		private EntitySet<PostTag> _PostTags;
-		
-		private EntityRef<Post> _Post1;
 		
 		private EntityRef<User> _User;
 		
@@ -803,16 +806,8 @@ namespace WebsiteBlogCMS.Data
     partial void OnidChanged();
     partial void OnauthorIdChanging(int value);
     partial void OnauthorIdChanged();
-    partial void OnparentIdChanging(System.Nullable<int> value);
-    partial void OnparentIdChanged();
     partial void OntitleChanging(string value);
     partial void OntitleChanged();
-    partial void OnmetaTitleChanging(string value);
-    partial void OnmetaTitleChanged();
-    partial void OnslugChanging(string value);
-    partial void OnslugChanged();
-    partial void OnsummaryChanging(string value);
-    partial void OnsummaryChanged();
     partial void OnpublishedChanging(bool value);
     partial void OnpublishedChanged();
     partial void OncreatedAtChanging(System.DateTime value);
@@ -828,10 +823,8 @@ namespace WebsiteBlogCMS.Data
 		public Post()
 		{
 			this._Comments = new EntitySet<Comment>(new Action<Comment>(this.attach_Comments), new Action<Comment>(this.detach_Comments));
-			this._Posts = new EntitySet<Post>(new Action<Post>(this.attach_Posts), new Action<Post>(this.detach_Posts));
 			this._PostCategories = new EntitySet<PostCategory>(new Action<PostCategory>(this.attach_PostCategories), new Action<PostCategory>(this.detach_PostCategories));
 			this._PostTags = new EntitySet<PostTag>(new Action<PostTag>(this.attach_PostTags), new Action<PostTag>(this.detach_PostTags));
-			this._Post1 = default(EntityRef<Post>);
 			this._User = default(EntityRef<User>);
 			OnCreated();
 		}
@@ -880,30 +873,6 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_parentId", DbType="Int")]
-		public System.Nullable<int> parentId
-		{
-			get
-			{
-				return this._parentId;
-			}
-			set
-			{
-				if ((this._parentId != value))
-				{
-					if (this._Post1.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnparentIdChanging(value);
-					this.SendPropertyChanging();
-					this._parentId = value;
-					this.SendPropertyChanged("parentId");
-					this.OnparentIdChanged();
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_title", DbType="VarChar(100) NOT NULL", CanBeNull=false)]
 		public string title
 		{
@@ -920,66 +889,6 @@ namespace WebsiteBlogCMS.Data
 					this._title = value;
 					this.SendPropertyChanged("title");
 					this.OntitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_metaTitle", DbType="VarChar(100)")]
-		public string metaTitle
-		{
-			get
-			{
-				return this._metaTitle;
-			}
-			set
-			{
-				if ((this._metaTitle != value))
-				{
-					this.OnmetaTitleChanging(value);
-					this.SendPropertyChanging();
-					this._metaTitle = value;
-					this.SendPropertyChanged("metaTitle");
-					this.OnmetaTitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_slug", DbType="VarChar(100) NOT NULL", CanBeNull=false)]
-		public string slug
-		{
-			get
-			{
-				return this._slug;
-			}
-			set
-			{
-				if ((this._slug != value))
-				{
-					this.OnslugChanging(value);
-					this.SendPropertyChanging();
-					this._slug = value;
-					this.SendPropertyChanged("slug");
-					this.OnslugChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_summary", DbType="NVarChar(MAX)")]
-		public string summary
-		{
-			get
-			{
-				return this._summary;
-			}
-			set
-			{
-				if ((this._summary != value))
-				{
-					this.OnsummaryChanging(value);
-					this.SendPropertyChanging();
-					this._summary = value;
-					this.SendPropertyChanged("summary");
-					this.OnsummaryChanged();
 				}
 			}
 		}
@@ -1064,7 +973,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_content", DbType="NVarChar(MAX)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_content", DbType="VarChar(MAX) NOT NULL", CanBeNull=false)]
 		public string content
 		{
 			get
@@ -1097,19 +1006,6 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_Post", Storage="_Posts", ThisKey="id", OtherKey="parentId")]
-		public EntitySet<Post> Posts
-		{
-			get
-			{
-				return this._Posts;
-			}
-			set
-			{
-				this._Posts.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_PostCategory", Storage="_PostCategories", ThisKey="id", OtherKey="postId")]
 		public EntitySet<PostCategory> PostCategories
 		{
@@ -1133,40 +1029,6 @@ namespace WebsiteBlogCMS.Data
 			set
 			{
 				this._PostTags.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_Post", Storage="_Post1", ThisKey="parentId", OtherKey="id", IsForeignKey=true)]
-		public Post Post1
-		{
-			get
-			{
-				return this._Post1.Entity;
-			}
-			set
-			{
-				Post previousValue = this._Post1.Entity;
-				if (((previousValue != value) 
-							|| (this._Post1.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Post1.Entity = null;
-						previousValue.Posts.Remove(this);
-					}
-					this._Post1.Entity = value;
-					if ((value != null))
-					{
-						value.Posts.Add(this);
-						this._parentId = value.id;
-					}
-					else
-					{
-						this._parentId = default(Nullable<int>);
-					}
-					this.SendPropertyChanged("Post1");
-				}
 			}
 		}
 		
@@ -1234,18 +1096,6 @@ namespace WebsiteBlogCMS.Data
 		{
 			this.SendPropertyChanging();
 			entity.Post = null;
-		}
-		
-		private void attach_Posts(Post entity)
-		{
-			this.SendPropertyChanging();
-			entity.Post1 = this;
-		}
-		
-		private void detach_Posts(Post entity)
-		{
-			this.SendPropertyChanging();
-			entity.Post1 = null;
 		}
 		
 		private void attach_PostCategories(PostCategory entity)
@@ -1619,12 +1469,6 @@ namespace WebsiteBlogCMS.Data
 		
 		private string _title;
 		
-		private string _metaTitle;
-		
-		private string _slug;
-		
-		private string _content;
-		
 		private EntitySet<PostTag> _PostTags;
 		
     #region Extensibility Method Definitions
@@ -1635,12 +1479,6 @@ namespace WebsiteBlogCMS.Data
     partial void OnidChanged();
     partial void OntitleChanging(string value);
     partial void OntitleChanged();
-    partial void OnmetaTitleChanging(string value);
-    partial void OnmetaTitleChanged();
-    partial void OnslugChanging(string value);
-    partial void OnslugChanged();
-    partial void OncontentChanging(string value);
-    partial void OncontentChanged();
     #endregion
 		
 		public Tag()
@@ -1685,66 +1523,6 @@ namespace WebsiteBlogCMS.Data
 					this._title = value;
 					this.SendPropertyChanged("title");
 					this.OntitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_metaTitle", DbType="VarChar(100)")]
-		public string metaTitle
-		{
-			get
-			{
-				return this._metaTitle;
-			}
-			set
-			{
-				if ((this._metaTitle != value))
-				{
-					this.OnmetaTitleChanging(value);
-					this.SendPropertyChanging();
-					this._metaTitle = value;
-					this.SendPropertyChanged("metaTitle");
-					this.OnmetaTitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_slug", DbType="VarChar(100) NOT NULL", CanBeNull=false)]
-		public string slug
-		{
-			get
-			{
-				return this._slug;
-			}
-			set
-			{
-				if ((this._slug != value))
-				{
-					this.OnslugChanging(value);
-					this.SendPropertyChanging();
-					this._slug = value;
-					this.SendPropertyChanged("slug");
-					this.OnslugChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_content", DbType="NVarChar(MAX)")]
-		public string content
-		{
-			get
-			{
-				return this._content;
-			}
-			set
-			{
-				if ((this._content != value))
-				{
-					this.OncontentChanging(value);
-					this.SendPropertyChanging();
-					this._content = value;
-					this.SendPropertyChanged("content");
-					this.OncontentChanged();
 				}
 			}
 		}
@@ -1803,27 +1581,33 @@ namespace WebsiteBlogCMS.Data
 		
 		private int _id;
 		
-		private string _firstName;
+		private int _roleId;
 		
-		private string _middleName;
+		private string _firstName;
 		
 		private string _lastName;
 		
-		private string _email;
+		private string _login;
 		
 		private string _passwordHash;
 		
-		private System.DateTime _registeredAt;
-		
-		private System.Nullable<System.DateTime> _lastLogin;
+		private System.Nullable<System.DateTime> _registeredAt;
 		
 		private string _intro;
 		
 		private string _profile;
 		
-		private bool _admin;
+		private System.Data.Linq.Binary _profileImage;
+		
+		private string _activationLink;
+		
+		private EntitySet<Comment> _Comments;
 		
 		private EntitySet<Post> _Posts;
+		
+		private EntitySet<UserToken> _UserTokens;
+		
+		private EntityRef<Role> _Role;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -1831,31 +1615,34 @@ namespace WebsiteBlogCMS.Data
     partial void OnCreated();
     partial void OnidChanging(int value);
     partial void OnidChanged();
+    partial void OnroleIdChanging(int value);
+    partial void OnroleIdChanged();
     partial void OnfirstNameChanging(string value);
     partial void OnfirstNameChanged();
-    partial void OnmiddleNameChanging(string value);
-    partial void OnmiddleNameChanged();
     partial void OnlastNameChanging(string value);
     partial void OnlastNameChanged();
-    partial void OnemailChanging(string value);
-    partial void OnemailChanged();
+    partial void OnloginChanging(string value);
+    partial void OnloginChanged();
     partial void OnpasswordHashChanging(string value);
     partial void OnpasswordHashChanged();
-    partial void OnregisteredAtChanging(System.DateTime value);
+    partial void OnregisteredAtChanging(System.Nullable<System.DateTime> value);
     partial void OnregisteredAtChanged();
-    partial void OnlastLoginChanging(System.Nullable<System.DateTime> value);
-    partial void OnlastLoginChanged();
     partial void OnintroChanging(string value);
     partial void OnintroChanged();
     partial void OnprofileChanging(string value);
     partial void OnprofileChanged();
-    partial void OnadminChanging(bool value);
-    partial void OnadminChanged();
+    partial void OnprofileImageChanging(System.Data.Linq.Binary value);
+    partial void OnprofileImageChanged();
+    partial void OnactivationLinkChanging(string value);
+    partial void OnactivationLinkChanged();
     #endregion
 		
 		public User()
 		{
+			this._Comments = new EntitySet<Comment>(new Action<Comment>(this.attach_Comments), new Action<Comment>(this.detach_Comments));
 			this._Posts = new EntitySet<Post>(new Action<Post>(this.attach_Posts), new Action<Post>(this.detach_Posts));
+			this._UserTokens = new EntitySet<UserToken>(new Action<UserToken>(this.attach_UserTokens), new Action<UserToken>(this.detach_UserTokens));
+			this._Role = default(EntityRef<Role>);
 			OnCreated();
 		}
 		
@@ -1875,6 +1662,30 @@ namespace WebsiteBlogCMS.Data
 					this._id = value;
 					this.SendPropertyChanged("id");
 					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_roleId", DbType="Int NOT NULL")]
+		public int roleId
+		{
+			get
+			{
+				return this._roleId;
+			}
+			set
+			{
+				if ((this._roleId != value))
+				{
+					if (this._Role.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnroleIdChanging(value);
+					this.SendPropertyChanging();
+					this._roleId = value;
+					this.SendPropertyChanged("roleId");
+					this.OnroleIdChanged();
 				}
 			}
 		}
@@ -1899,26 +1710,6 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_middleName", DbType="VarChar(50)")]
-		public string middleName
-		{
-			get
-			{
-				return this._middleName;
-			}
-			set
-			{
-				if ((this._middleName != value))
-				{
-					this.OnmiddleNameChanging(value);
-					this.SendPropertyChanging();
-					this._middleName = value;
-					this.SendPropertyChanged("middleName");
-					this.OnmiddleNameChanged();
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_lastName", DbType="VarChar(50)")]
 		public string lastName
 		{
@@ -1939,27 +1730,27 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_email", DbType="VarChar(50)")]
-		public string email
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_login", DbType="VarChar(100)")]
+		public string login
 		{
 			get
 			{
-				return this._email;
+				return this._login;
 			}
 			set
 			{
-				if ((this._email != value))
+				if ((this._login != value))
 				{
-					this.OnemailChanging(value);
+					this.OnloginChanging(value);
 					this.SendPropertyChanging();
-					this._email = value;
-					this.SendPropertyChanged("email");
-					this.OnemailChanged();
+					this._login = value;
+					this.SendPropertyChanged("login");
+					this.OnloginChanged();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_passwordHash", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_passwordHash", DbType="VarChar(MAX)")]
 		public string passwordHash
 		{
 			get
@@ -1979,8 +1770,8 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_registeredAt", DbType="DateTime NOT NULL")]
-		public System.DateTime registeredAt
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_registeredAt", DbType="DateTime")]
+		public System.Nullable<System.DateTime> registeredAt
 		{
 			get
 			{
@@ -1999,27 +1790,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_lastLogin", DbType="DateTime")]
-		public System.Nullable<System.DateTime> lastLogin
-		{
-			get
-			{
-				return this._lastLogin;
-			}
-			set
-			{
-				if ((this._lastLogin != value))
-				{
-					this.OnlastLoginChanging(value);
-					this.SendPropertyChanging();
-					this._lastLogin = value;
-					this.SendPropertyChanged("lastLogin");
-					this.OnlastLoginChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_intro", DbType="NVarChar(MAX)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_intro", DbType="VarChar(100)")]
 		public string intro
 		{
 			get
@@ -2039,7 +1810,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_profile", DbType="NVarChar(MAX)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_profile", DbType="VarChar(MAX)")]
 		public string profile
 		{
 			get
@@ -2059,23 +1830,56 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_admin", DbType="Bit NOT NULL")]
-		public bool admin
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_profileImage", DbType="VarBinary(MAX)", UpdateCheck=UpdateCheck.Never)]
+		public System.Data.Linq.Binary profileImage
 		{
 			get
 			{
-				return this._admin;
+				return this._profileImage;
 			}
 			set
 			{
-				if ((this._admin != value))
+				if ((this._profileImage != value))
 				{
-					this.OnadminChanging(value);
+					this.OnprofileImageChanging(value);
 					this.SendPropertyChanging();
-					this._admin = value;
-					this.SendPropertyChanged("admin");
-					this.OnadminChanged();
+					this._profileImage = value;
+					this.SendPropertyChanged("profileImage");
+					this.OnprofileImageChanged();
 				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_activationLink", DbType="VarChar(MAX)")]
+		public string activationLink
+		{
+			get
+			{
+				return this._activationLink;
+			}
+			set
+			{
+				if ((this._activationLink != value))
+				{
+					this.OnactivationLinkChanging(value);
+					this.SendPropertyChanging();
+					this._activationLink = value;
+					this.SendPropertyChanged("activationLink");
+					this.OnactivationLinkChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Comment", Storage="_Comments", ThisKey="id", OtherKey="authorId")]
+		public EntitySet<Comment> Comments
+		{
+			get
+			{
+				return this._Comments;
+			}
+			set
+			{
+				this._Comments.Assign(value);
 			}
 		}
 		
@@ -2089,6 +1893,53 @@ namespace WebsiteBlogCMS.Data
 			set
 			{
 				this._Posts.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_UserToken", Storage="_UserTokens", ThisKey="id", OtherKey="userId")]
+		public EntitySet<UserToken> UserTokens
+		{
+			get
+			{
+				return this._UserTokens;
+			}
+			set
+			{
+				this._UserTokens.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Role_User", Storage="_Role", ThisKey="roleId", OtherKey="id", IsForeignKey=true)]
+		public Role Role
+		{
+			get
+			{
+				return this._Role.Entity;
+			}
+			set
+			{
+				Role previousValue = this._Role.Entity;
+				if (((previousValue != value) 
+							|| (this._Role.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Role.Entity = null;
+						previousValue.Users.Remove(this);
+					}
+					this._Role.Entity = value;
+					if ((value != null))
+					{
+						value.Users.Add(this);
+						this._roleId = value.id;
+					}
+					else
+					{
+						this._roleId = default(int);
+					}
+					this.SendPropertyChanged("Role");
+				}
 			}
 		}
 		
@@ -2112,6 +1963,18 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
+		private void attach_Comments(Comment entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_Comments(Comment entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+		
 		private void attach_Posts(Post entity)
 		{
 			this.SendPropertyChanging();
@@ -2122,6 +1985,307 @@ namespace WebsiteBlogCMS.Data
 		{
 			this.SendPropertyChanging();
 			entity.User = null;
+		}
+		
+		private void attach_UserTokens(UserToken entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_UserTokens(UserToken entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Role")]
+	public partial class Role : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _name;
+		
+		private EntitySet<User> _Users;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnnameChanging(string value);
+    partial void OnnameChanged();
+    #endregion
+		
+		public Role()
+		{
+			this._Users = new EntitySet<User>(new Action<User>(this.attach_Users), new Action<User>(this.detach_Users));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_name", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		public string name
+		{
+			get
+			{
+				return this._name;
+			}
+			set
+			{
+				if ((this._name != value))
+				{
+					this.OnnameChanging(value);
+					this.SendPropertyChanging();
+					this._name = value;
+					this.SendPropertyChanged("name");
+					this.OnnameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Role_User", Storage="_Users", ThisKey="id", OtherKey="roleId")]
+		public EntitySet<User> Users
+		{
+			get
+			{
+				return this._Users;
+			}
+			set
+			{
+				this._Users.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Users(User entity)
+		{
+			this.SendPropertyChanging();
+			entity.Role = this;
+		}
+		
+		private void detach_Users(User entity)
+		{
+			this.SendPropertyChanging();
+			entity.Role = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.UserTokens")]
+	public partial class UserToken : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private int _userId;
+		
+		private string _token;
+		
+		private System.DateTime _expireDate;
+		
+		private EntityRef<User> _User;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnuserIdChanging(int value);
+    partial void OnuserIdChanged();
+    partial void OntokenChanging(string value);
+    partial void OntokenChanged();
+    partial void OnexpireDateChanging(System.DateTime value);
+    partial void OnexpireDateChanged();
+    #endregion
+		
+		public UserToken()
+		{
+			this._User = default(EntityRef<User>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_userId", DbType="Int NOT NULL")]
+		public int userId
+		{
+			get
+			{
+				return this._userId;
+			}
+			set
+			{
+				if ((this._userId != value))
+				{
+					if (this._User.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnuserIdChanging(value);
+					this.SendPropertyChanging();
+					this._userId = value;
+					this.SendPropertyChanged("userId");
+					this.OnuserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_token", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string token
+		{
+			get
+			{
+				return this._token;
+			}
+			set
+			{
+				if ((this._token != value))
+				{
+					this.OntokenChanging(value);
+					this.SendPropertyChanging();
+					this._token = value;
+					this.SendPropertyChanged("token");
+					this.OntokenChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_expireDate", DbType="DateTime NOT NULL")]
+		public System.DateTime expireDate
+		{
+			get
+			{
+				return this._expireDate;
+			}
+			set
+			{
+				if ((this._expireDate != value))
+				{
+					this.OnexpireDateChanging(value);
+					this.SendPropertyChanging();
+					this._expireDate = value;
+					this.SendPropertyChanged("expireDate");
+					this.OnexpireDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_UserToken", Storage="_User", ThisKey="userId", OtherKey="id", IsForeignKey=true)]
+		public User User
+		{
+			get
+			{
+				return this._User.Entity;
+			}
+			set
+			{
+				User previousValue = this._User.Entity;
+				if (((previousValue != value) 
+							|| (this._User.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User.Entity = null;
+						previousValue.UserTokens.Remove(this);
+					}
+					this._User.Entity = value;
+					if ((value != null))
+					{
+						value.UserTokens.Add(this);
+						this._userId = value.id;
+					}
+					else
+					{
+						this._userId = default(int);
+					}
+					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 }

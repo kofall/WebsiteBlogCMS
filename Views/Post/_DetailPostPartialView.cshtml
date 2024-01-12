@@ -1,0 +1,121 @@
+﻿@model WebsiteBlogCMS.Models.PostViewModel
+
+<div class="modal fade" id="DetailPost-@Model.Post.id" aria-labelledby="DetailPostLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DetailPostLabel">Szczegóły postu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        Tytuł
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Post.title)
+                    </dd>
+
+                    <dt class="col-sm-4">
+                        Utworzono
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Post.createdAt)
+                    </dd>
+
+                    @if (Model.Post.updatedAt != null)
+                    {
+                        <dt class="col-sm-4">
+                            Ostatnia modyfikacja
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Post.updatedAt)
+                        </dd>
+                    }
+
+                    <dt class="col-sm-4">
+                        Widoczny
+                    </dt>
+                    <dd class="col-sm-8">
+                        @if (!Model.Post.published)
+                        {
+                            @:Nie
+                        }
+                        else
+                        {
+                            @:Tak
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">
+                        Zatwierdzono dnia
+                    </dt>
+                    <dd class="col-sm-7">
+                        @Html.DisplayFor(model => model.Post.publishedAt)
+                    </dd>
+
+                    <dt class="col-sm-4">
+                        Kategorie
+                    </dt>
+                    <dd class="col-sm-8">
+                        @foreach (var categoryId in Model.SelectedCategories)
+                        {
+                            var categoryName = "";
+                            if (ViewBag.Categories != null)
+                            {
+                                foreach (var category in ViewBag.Categories)
+                                {
+                                    if (category.id == categoryId)
+                                    {
+                                        categoryName = category.title;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(categoryName))
+                            {
+                                @categoryName
+                            }
+                        }
+                    </dd>
+
+                    @*<dt class="col-sm-4">
+                        Tagi
+                    </dt>
+                    <dd class="col-sm-8">
+                        @foreach (var tagId in Model.SelectedTags)
+                        {
+                            @{
+                                var tagName = "";
+                                if (ViewBag.Tags != null)
+                                {
+                                    foreach (var tag in ViewBag.Tags)
+                                    {
+                                        if (tag.id == tagId)
+                                        {
+                                            tagName = tag.title;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            @if (!string.IsNullOrEmpty(tagName))
+                            {
+                                @Html.Display(tagName);
+                            }
+                        }
+                    </dd>*@
+
+                    <dt class="col-sm-4">
+                        Treść
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Post.content)
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

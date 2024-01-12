@@ -3,86 +3,101 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using WebsiteBlogCMS.Classes;
+using WebsiteBlogCMS.Data;
 
 namespace WebsiteBlogCMS.Controllers
 {
     public class TagController : Controller
     {
-        // GET: Tag
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        // GET: Tag/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: Tag/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Tag/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Create(Tag tag)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add insert logic here
+                using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
+                {
+                    bool isValid = !ctx.Tags.Where(x => x.title.Equals(tag.title)).Any();
 
-                return RedirectToAction("Index");
+                    if (!isValid)
+                    {
+                        ViewBag.ErrorMessage = "Tag o takiej nazwie już istnieje!";
+                        return View("HttpNotFound");
+                    }
+
+                    ctx.Tags.InsertOnSubmit(tag);
+                    ctx.SubmitChanges();
+
+                    return RedirectToAction("Tags", "Admin");
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View("HttpNotFound");
         }
 
-        // GET: Tag/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Tag/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(Tag tag)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add update logic here
+                using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
+                {
+                    bool isValid = !ctx.Tags.Where(x => x.title.Equals(tag.title) && x.id != tag.id).Any();
 
-                return RedirectToAction("Index");
+                    if (!isValid)
+                    {
+                        ViewBag.ErrorMessage = "Tag o takiej nazwie już istnieje!";
+                        return View("HttpNotFound");
+                    }
+
+                    Tag TagData = ctx.Tags.Where(x => x.id.Equals(tag.id)).SingleOrDefault();
+
+                    if (TagData == null)
+                    {
+                        return View("HttpNotFound");
+                    }
+
+                    TagData.title = tag.title;
+
+                    ctx.SubmitChanges();
+
+                    return RedirectToAction("Tags", "Admin");
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View("HttpNotFound");
         }
 
-        // GET: Tag/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
+            {
+                Tag tag = ctx.Tags.Where(x => x.id.Equals(id)).SingleOrDefault();
+
+                if (tag != null)
+                {
+                    ctx.Tags.DeleteOnSubmit(tag);
+                    ctx.SubmitChanges();
+                }
+            }
+            return RedirectToAction("Tags", "Admin");
         }
 
-        // POST: Tag/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult LoadTagPartialView(string operation, int id)
         {
-            try
+            using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
             {
-                // TODO: Add delete logic here
+                Tag tag = new Tag();
 
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
+                if (operation != "Create")
+                {
+                    tag = ctx.Tags.Where(x => x.id.Equals(id)).SingleOrDefault();
+
+                    if (tag == null)
+                    {
+                        return HttpNotFound();
+                    }
+                }
+
+                return PartialView($"_{operation}TagPartialView", tag);
             }
         }
     }

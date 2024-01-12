@@ -1,85 +1,106 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Linq;
 using System.Web.Mvc;
+using WebsiteBlogCMS.Classes;
+using WebsiteBlogCMS.Data;
 
 namespace WebsiteBlogCMS.Controllers
 {
+
     public class CategoryController : Controller
     {
-        // GET: Category
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        // GET: Category/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: Category/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Category/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Create(Category category)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add insert logic here
+                using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
+                {
+                    bool isValid = !ctx.Categories.Where(x => x.title.Equals(category.title)).Any();
 
-                return RedirectToAction("Index");
+                    if(!isValid)
+                    {
+                        ViewBag.ErrorMessage = "Kategoria o takiej nazwie już istnieje!";
+                        return View("HttpNotFound");
+                    }
+
+                    ctx.Categories.InsertOnSubmit(category);
+                    ctx.SubmitChanges();
+
+                    return RedirectToAction("Categories", "Admin");
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View("HttpNotFound");
         }
 
-        // GET: Category/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Category/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(Category category)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add update logic here
+                using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
+                {
+                    bool isValid = !ctx.Categories.Where(x => x.title.Equals(category.title) && x.id != category.id).Any();
 
-                return RedirectToAction("Index");
+                    if (!isValid)
+                    {
+                        ViewBag.ErrorMessage = "Kategoria o takiej nazwie już istnieje!";
+                        return View("HttpNotFound");
+                    }
+
+                    Category categoryData = ctx.Categories.Where(x => x.id.Equals(category.id)).SingleOrDefault();
+
+                    if(categoryData == null)
+                    {
+                        return View("HttpNotFound");
+                    }
+
+                    categoryData.title = category.title;
+                    categoryData.parentId = category.parentId;
+                    categoryData.content = category.content;
+
+                    ctx.SubmitChanges();
+
+                    return RedirectToAction("Categories", "Admin");
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View("HttpNotFound");
         }
 
-        // GET: Category/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
+            {
+                Category category = ctx.Categories.Where(x => x.id.Equals(id)).SingleOrDefault();
+
+                if (category != null)
+                {
+                    ctx.Categories.DeleteOnSubmit(category);
+                    ctx.SubmitChanges();
+                }
+            }
+            return RedirectToAction("Categories", "Admin");
         }
 
-        // POST: Category/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult LoadCategoryPartialView(string operation, int id)
         {
-            try
+            using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
             {
-                // TODO: Add delete logic here
+                Category category = new Category();
 
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
+                if (operation != "Create")
+                {
+                    category = ctx.Categories.Where(x => x.id.Equals(id)).SingleOrDefault();
+
+                    if (category == null)
+                    {
+                        return HttpNotFound();
+                    }
+                }
+
+                ViewBag.Categories = ctx.Categories.ToList();
+
+                return PartialView($"_{operation}CategoryPartialView", category);
             }
         }
     }

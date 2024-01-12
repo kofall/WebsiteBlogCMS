@@ -1,0 +1,156 @@
+﻿@model IEnumerable<WebsiteBlogCMS.Data.User>
+
+@{
+    ViewBag.Title = "Użytkownicy";
+    Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Lista użytkowników</h1>
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-table me-1"></i> Użytkownicy</span>
+                <button type="button" class="btn btn-success" data-toggle="modal" onclick="loadPartialView('Create', 0)">
+                    Create
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <table id="datatablesSimple">
+                <thead>
+                    <tr>
+                        <th>
+                            Rola
+                        </th>
+                        <th>
+                            Imię
+                        </th>
+                        <th>
+                            Nazwisko
+                        </th>
+                        <th>
+                            Login
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>
+                            Rola
+                        </th>
+                        <th>
+                            Imię
+                        </th>
+                        <th>
+                            Nazwisko
+                        </th>
+                        <th>
+                            Login
+                        </th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Role.name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.firstName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.lastName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.login)
+                            </td>
+                            <td>
+                                @if (item.registeredAt == null)
+                                {
+                                    <button type="button" class="btn btn-info" data-toggle="modal" onclick="showActivationLinkModal(@item.id)">
+                                        Link aktywacyjny
+                                    </button>
+                                }
+                                else
+                                {
+                                    <!-- User is registered -->
+                                    <button type="button" class="btn btn-warning" data-toggle="modal" onclick="loadPartialView('Edit', @item.id)">
+                                        Edit
+                                    </button>
+                                    <button type="button" class="btn btn-info" data-toggle="modal" onclick="loadPartialView('Detail', @item.id)">
+                                        Detail
+                                    </button>
+                                }
+                                <button type="button" class="btn btn-danger" data-toggle="modal" onclick="loadPartialView('Delete', @item.id)">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div id="myModal">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function loadPartialView(operation, id) {
+        var url = '@Url.Action("LoadUserPartialView", "User")';
+
+        jQuery.ajax({
+            url: url,
+            type: 'GET',
+            data: { operation: operation, id: id },
+            success: function (data) {
+                $('#myModal').html(data);
+                $('#' + operation + 'User-' + id).modal('show');
+            },
+            error: function () {
+                alert('Error loading partial view.');
+            }
+        });
+    }
+</script>
+
+<script>
+    function showActivationLinkModal(id) {
+        // Check if the flag is set to show the ActivationLinkPartialView
+        var url = '@Url.Action("LoadActivationLinkPartialView", "User")';
+
+        jQuery.ajax({
+            url: url,
+            type: 'GET',
+            data: { id: id },
+            success: function (data) {
+                $('#myModal').html(data);
+                $('#ActivationLink-' + id).modal('show');
+            },
+            error: function () {
+                alert('Error loading ActivationLinkPartialView.');
+            }
+        });
+    }
+</script>
+
+<script>
+    jQuery.noConflict(); // Use this only once
+
+    $(document).ready(function () {
+        // Call the function when needed
+        var showActivationLink = @Html.Raw(Json.Encode(TempData["ShowActivationLink"]));
+        var userId = @Html.Raw(Json.Encode(TempData["UserToShow"]));
+
+        if (showActivationLink) {
+            showActivationLinkModal(userId);
+        }
+    });
+</script>
