@@ -22,11 +22,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.7.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- TinyMCE -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.tiny.cloud/1/v620ei0n2wf0tknekqz8nzft3wy2usjctlkccmgjnzf78xoy/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
         @Html.ActionLink("Admin panel", "Index", "Admin", null, new { @class = "navbar-brand ps-3" })
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
         <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
         </form>
         <!-- Navbar-->
@@ -34,9 +39,9 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="#!">Settings</a></li>
+                    <li>@Html.ActionLink("Ustawienia", "Settings", "Admin", new { login = User.Identity.Name }, new { @class = "dropdown-item" })</li>
                     <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" href="#!">Logout</a></li>
+                    <li>@Html.ActionLink("Wyloguj", "Logout", "Admin", null, new { @class = "dropdown-item" })</li>
                 </ul>
             </li>
         </ul>
@@ -46,20 +51,52 @@
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
                     <div class="nav">
-                        <div class="sb-sidenav-menu-heading">Administrator</div>
-                        @Html.ActionLink("Użytkownicy", "Users", "Admin", null, new { @class = "nav-link" })
-                        <div class="sb-sidenav-menu-heading">Moderator</div>
-                        @Html.ActionLink("Strona główna", "HomeEdit", "Admin", null, new { @class = "nav-link" })
-                        <div class="sb-sidenav-menu-heading">Redaktor</div>
-                        @Html.ActionLink("Kategorie", "Categories", "Admin", null, new { @class = "nav-link" })
-                        @Html.ActionLink("Tagi", "Tags", "Admin", null, new { @class = "nav-link" })
-                        @Html.ActionLink("Posts", "Posts", "Admin", null, new { @class = "nav-link" })
-                        @Html.ActionLink("Comments", "Comments", "Admin", null, new { @class = "nav-link" })
+                        @if (WebsiteBlogCMS.Classes.DataHelper.UserUtils.HasPermission(1, User.Identity.Name))
+                        {
+                            <div class="sb-sidenav-menu-heading">Administrator</div>
+                            @Html.ActionLink("Użytkownicy", "Users", "Admin", null, new { @class = "nav-link" })
+                        }
+                        @if (WebsiteBlogCMS.Classes.DataHelper.UserUtils.HasPermission(2, User.Identity.Name))
+                        {
+                            <div class="sb-sidenav-menu-heading">Moderator</div>
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseElements" aria-expanded="false" aria-controls="collapseElements">
+                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                                Elementy
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseElements" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    @Html.ActionLink("Slajdy", "Sliders", "Admin", null, new { @class = "nav-link" })
+                                    @Html.ActionLink("Kategorie", "Categories", "Admin", null, new { @class = "nav-link" })
+                                    @Html.ActionLink("Tagi", "Tags", "Admin", null, new { @class = "nav-link" })
+                                </nav>
+                            </div>
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseManaging" aria-expanded="false" aria-controls="collapseManaging">
+                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                                Zarządzanie
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseManaging" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    @Html.ActionLink("Wybór slajdów", "SlidersPick", "Admin", null, new { @class = "nav-link" })
+                                    @Html.ActionLink("Wybór kategorii", "CategoriesPick", "Admin", null, new { @class = "nav-link" })
+                                    @Html.ActionLink("Wybór redakcyjny", "EditorsPick", "Admin", null, new { @class = "nav-link" })
+                                    @Html.ActionLink("Wybór postów miesiąca", "MonthPostsPick", "Admin", null, new { @class = "nav-link" })
+                                    @Html.ActionLink("Wybór trendów", "Trends", "Admin", null, new { @class = "nav-link" })
+                                </nav>
+                            </div>
+                        }
+                        @if (WebsiteBlogCMS.Classes.DataHelper.UserUtils.HasPermission(3, User.Identity.Name))
+                        {
+                            <div class="sb-sidenav-menu-heading">Redaktor</div>
+                            @Html.ActionLink("Posts", "Posts", "Admin", null, new { @class = "nav-link" })
+                            @Html.ActionLink("Comments", "Comments", "Admin", null, new { @class = "nav-link" })
+                        }
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    Start Bootstrap
+                        @User.Identity.Name
                 </div>
             </nav>
         </div>

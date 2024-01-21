@@ -16,7 +16,7 @@ namespace WebsiteBlogCMS.Classes
 
         public static void StoreToken(int userId, string token)
         {
-            using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
+            var ctx = DbHelper.DataContext;
             {
                 UserToken userToken = new UserToken();
 
@@ -30,7 +30,7 @@ namespace WebsiteBlogCMS.Classes
 
         public static bool ValidateToken(string token)
         {
-            using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
+            var ctx = DbHelper.DataContext;
             {
                 var tokenData = ctx.UserTokens.Where(x => x.token.Equals(token)).SingleOrDefault();
 
@@ -49,7 +49,7 @@ namespace WebsiteBlogCMS.Classes
 
         public static void RemoveToken(string token)
         {
-            using (var ctx = new BlogDBDataContext(DbHelper.ConnectionBlog))
+            var ctx = DbHelper.DataContext;
             {
                 var tokenData = ctx.UserTokens.Where(x => x.token.Equals(token)).SingleOrDefault();
 

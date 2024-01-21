@@ -7,6 +7,7 @@
 
 <div class="container-fluid px-4">
     <h1 class="mt-4">Lista kategorii</h1>
+    @Html.Partial("../Shared/_Message")
     <div class="card mb-4">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
@@ -78,7 +79,7 @@
     jQuery.noConflict(); // Use this only once
 
     function loadPartialView(operation, id) {
-        var url = '@Url.Action("LoadCategoryPartialView", "Category")';
+        var url = '@Url.Action("LoadPartialView", "Category")';
 
         jQuery.ajax({
             url: url,

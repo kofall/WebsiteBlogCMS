@@ -1,7 +1,7 @@
 ﻿@model WebsiteBlogCMS.Data.Category
 
 <div class="modal fade" id="DeleteCategory-@Model.id" aria-labelledby="DeleteCategoryLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="DeleteCategoryLabel">Czy jesteś pewien, że chcesz usunąć kategorię?</h5>
@@ -11,29 +11,29 @@
             </div>
             <div class="modal-body">
                 <dl class="row">
-                    <dt class="col-sm-4">
+                    <dt class="col-sm-3">
                         Nazwa
                     </dt>
-                    <dd class="col-sm-8">
+                    <dd class="col-sm-9">
                         @Html.DisplayFor(model => model.title)
                     </dd>
-                    <dt class="col-sm-4">
+                    <dt class="col-sm-3">
                         Kategoria nadrzędna
                     </dt>
-                    <dd class="col-sm-8">
+                    <dd class="col-sm-9">
                         @if (Model.parentId == null)
                         {
                             @Html.Display("Brak");
                         }
                         else
                         {
-                            @Html.DisplayFor(model => model.parentId)
+                            @Html.DisplayFor(model => model.Category1.title)
                         }
                     </dd>
-                    <dt class="col-sm-4">
+                    <dt class="col-sm-3">
                         Opis
                     </dt>
-                    <dd class="col-sm-8">
+                    <dd class="col-sm-9">
                         @Html.DisplayFor(model => model.content)
                     </dd>
                 </dl>

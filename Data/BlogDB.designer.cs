@@ -33,9 +33,18 @@ namespace WebsiteBlogCMS.Data
     partial void InsertCategory(Category instance);
     partial void UpdateCategory(Category instance);
     partial void DeleteCategory(Category instance);
+    partial void InsertUserToken(UserToken instance);
+    partial void UpdateUserToken(UserToken instance);
+    partial void DeleteUserToken(UserToken instance);
+    partial void InsertCategorySetting(CategorySetting instance);
+    partial void UpdateCategorySetting(CategorySetting instance);
+    partial void DeleteCategorySetting(CategorySetting instance);
     partial void InsertComment(Comment instance);
     partial void UpdateComment(Comment instance);
     partial void DeleteComment(Comment instance);
+    partial void InsertEditorsPick(EditorsPick instance);
+    partial void UpdateEditorsPick(EditorsPick instance);
+    partial void DeleteEditorsPick(EditorsPick instance);
     partial void InsertPost(Post instance);
     partial void UpdatePost(Post instance);
     partial void DeletePost(Post instance);
@@ -45,18 +54,27 @@ namespace WebsiteBlogCMS.Data
     partial void InsertPostTag(PostTag instance);
     partial void UpdatePostTag(PostTag instance);
     partial void DeletePostTag(PostTag instance);
-    partial void InsertTag(Tag instance);
-    partial void UpdateTag(Tag instance);
-    partial void DeleteTag(Tag instance);
-    partial void InsertUser(User instance);
-    partial void UpdateUser(User instance);
-    partial void DeleteUser(User instance);
     partial void InsertRole(Role instance);
     partial void UpdateRole(Role instance);
     partial void DeleteRole(Role instance);
-    partial void InsertUserToken(UserToken instance);
-    partial void UpdateUserToken(UserToken instance);
-    partial void DeleteUserToken(UserToken instance);
+    partial void InsertSlider(Slider instance);
+    partial void UpdateSlider(Slider instance);
+    partial void DeleteSlider(Slider instance);
+    partial void InsertTag(Tag instance);
+    partial void UpdateTag(Tag instance);
+    partial void DeleteTag(Tag instance);
+    partial void InsertTopMonthPick(TopMonthPick instance);
+    partial void UpdateTopMonthPick(TopMonthPick instance);
+    partial void DeleteTopMonthPick(TopMonthPick instance);
+    partial void InsertTopPick(TopPick instance);
+    partial void UpdateTopPick(TopPick instance);
+    partial void DeleteTopPick(TopPick instance);
+    partial void InsertSliderPick(SliderPick instance);
+    partial void UpdateSliderPick(SliderPick instance);
+    partial void DeleteSliderPick(SliderPick instance);
+    partial void InsertUser(User instance);
+    partial void UpdateUser(User instance);
+    partial void DeleteUser(User instance);
     #endregion
 		
 		public BlogDBDataContext(string connection) : 
@@ -91,11 +109,35 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
+		public System.Data.Linq.Table<UserToken> UserTokens
+		{
+			get
+			{
+				return this.GetTable<UserToken>();
+			}
+		}
+		
+		public System.Data.Linq.Table<CategorySetting> CategorySettings
+		{
+			get
+			{
+				return this.GetTable<CategorySetting>();
+			}
+		}
+		
 		public System.Data.Linq.Table<Comment> Comments
 		{
 			get
 			{
 				return this.GetTable<Comment>();
+			}
+		}
+		
+		public System.Data.Linq.Table<EditorsPick> EditorsPicks
+		{
+			get
+			{
+				return this.GetTable<EditorsPick>();
 			}
 		}
 		
@@ -123,22 +165,6 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		public System.Data.Linq.Table<Tag> Tags
-		{
-			get
-			{
-				return this.GetTable<Tag>();
-			}
-		}
-		
-		public System.Data.Linq.Table<User> Users
-		{
-			get
-			{
-				return this.GetTable<User>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Role> Roles
 		{
 			get
@@ -147,11 +173,51 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		public System.Data.Linq.Table<UserToken> UserTokens
+		public System.Data.Linq.Table<Slider> Sliders
 		{
 			get
 			{
-				return this.GetTable<UserToken>();
+				return this.GetTable<Slider>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Tag> Tags
+		{
+			get
+			{
+				return this.GetTable<Tag>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TopMonthPick> TopMonthPicks
+		{
+			get
+			{
+				return this.GetTable<TopMonthPick>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TopPick> TopPicks
+		{
+			get
+			{
+				return this.GetTable<TopPick>();
+			}
+		}
+		
+		public System.Data.Linq.Table<SliderPick> SliderPicks
+		{
+			get
+			{
+				return this.GetTable<SliderPick>();
+			}
+		}
+		
+		public System.Data.Linq.Table<User> Users
+		{
+			get
+			{
+				return this.GetTable<User>();
 			}
 		}
 	}
@@ -171,6 +237,8 @@ namespace WebsiteBlogCMS.Data
 		private string _content;
 		
 		private EntitySet<Category> _Categories;
+		
+		private EntitySet<CategorySetting> _CategorySettings;
 		
 		private EntitySet<PostCategory> _PostCategories;
 		
@@ -193,6 +261,7 @@ namespace WebsiteBlogCMS.Data
 		public Category()
 		{
 			this._Categories = new EntitySet<Category>(new Action<Category>(this.attach_Categories), new Action<Category>(this.detach_Categories));
+			this._CategorySettings = new EntitySet<CategorySetting>(new Action<CategorySetting>(this.attach_CategorySettings), new Action<CategorySetting>(this.detach_CategorySettings));
 			this._PostCategories = new EntitySet<PostCategory>(new Action<PostCategory>(this.attach_PostCategories), new Action<PostCategory>(this.detach_PostCategories));
 			this._Category1 = default(EntityRef<Category>);
 			OnCreated();
@@ -295,6 +364,19 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Category_CategorySetting", Storage="_CategorySettings", ThisKey="id", OtherKey="categoryId")]
+		public EntitySet<CategorySetting> CategorySettings
+		{
+			get
+			{
+				return this._CategorySettings;
+			}
+			set
+			{
+				this._CategorySettings.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Category_PostCategory", Storage="_PostCategories", ThisKey="id", OtherKey="categoryId")]
 		public EntitySet<PostCategory> PostCategories
 		{
@@ -374,6 +456,18 @@ namespace WebsiteBlogCMS.Data
 			entity.Category1 = null;
 		}
 		
+		private void attach_CategorySettings(CategorySetting entity)
+		{
+			this.SendPropertyChanging();
+			entity.Category = this;
+		}
+		
+		private void detach_CategorySettings(CategorySetting entity)
+		{
+			this.SendPropertyChanging();
+			entity.Category = null;
+		}
+		
 		private void attach_PostCategories(PostCategory entity)
 		{
 			this.SendPropertyChanging();
@@ -384,6 +478,332 @@ namespace WebsiteBlogCMS.Data
 		{
 			this.SendPropertyChanging();
 			entity.Category = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.UserTokens")]
+	public partial class UserToken : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private int _userId;
+		
+		private string _token;
+		
+		private System.DateTime _expireDate;
+		
+		private EntityRef<User> _User;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnuserIdChanging(int value);
+    partial void OnuserIdChanged();
+    partial void OntokenChanging(string value);
+    partial void OntokenChanged();
+    partial void OnexpireDateChanging(System.DateTime value);
+    partial void OnexpireDateChanged();
+    #endregion
+		
+		public UserToken()
+		{
+			this._User = default(EntityRef<User>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_userId", DbType="Int NOT NULL")]
+		public int userId
+		{
+			get
+			{
+				return this._userId;
+			}
+			set
+			{
+				if ((this._userId != value))
+				{
+					if (this._User.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnuserIdChanging(value);
+					this.SendPropertyChanging();
+					this._userId = value;
+					this.SendPropertyChanged("userId");
+					this.OnuserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_token", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string token
+		{
+			get
+			{
+				return this._token;
+			}
+			set
+			{
+				if ((this._token != value))
+				{
+					this.OntokenChanging(value);
+					this.SendPropertyChanging();
+					this._token = value;
+					this.SendPropertyChanged("token");
+					this.OntokenChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_expireDate", DbType="DateTime NOT NULL")]
+		public System.DateTime expireDate
+		{
+			get
+			{
+				return this._expireDate;
+			}
+			set
+			{
+				if ((this._expireDate != value))
+				{
+					this.OnexpireDateChanging(value);
+					this.SendPropertyChanging();
+					this._expireDate = value;
+					this.SendPropertyChanged("expireDate");
+					this.OnexpireDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_UserToken", Storage="_User", ThisKey="userId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public User User
+		{
+			get
+			{
+				return this._User.Entity;
+			}
+			set
+			{
+				User previousValue = this._User.Entity;
+				if (((previousValue != value) 
+							|| (this._User.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User.Entity = null;
+						previousValue.UserTokens.Remove(this);
+					}
+					this._User.Entity = value;
+					if ((value != null))
+					{
+						value.UserTokens.Add(this);
+						this._userId = value.id;
+					}
+					else
+					{
+						this._userId = default(int);
+					}
+					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.CategorySettings")]
+	public partial class CategorySetting : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private int _categoryId;
+		
+		private int _position;
+		
+		private EntityRef<Category> _Category;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OncategoryIdChanging(int value);
+    partial void OncategoryIdChanged();
+    partial void OnpositionChanging(int value);
+    partial void OnpositionChanged();
+    #endregion
+		
+		public CategorySetting()
+		{
+			this._Category = default(EntityRef<Category>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_categoryId", DbType="Int NOT NULL")]
+		public int categoryId
+		{
+			get
+			{
+				return this._categoryId;
+			}
+			set
+			{
+				if ((this._categoryId != value))
+				{
+					if (this._Category.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OncategoryIdChanging(value);
+					this.SendPropertyChanging();
+					this._categoryId = value;
+					this.SendPropertyChanged("categoryId");
+					this.OncategoryIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_position", DbType="Int NOT NULL")]
+		public int position
+		{
+			get
+			{
+				return this._position;
+			}
+			set
+			{
+				if ((this._position != value))
+				{
+					this.OnpositionChanging(value);
+					this.SendPropertyChanging();
+					this._position = value;
+					this.SendPropertyChanged("position");
+					this.OnpositionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Category_CategorySetting", Storage="_Category", ThisKey="categoryId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public Category Category
+		{
+			get
+			{
+				return this._Category.Entity;
+			}
+			set
+			{
+				Category previousValue = this._Category.Entity;
+				if (((previousValue != value) 
+							|| (this._Category.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Category.Entity = null;
+						previousValue.CategorySettings.Remove(this);
+					}
+					this._Category.Entity = value;
+					if ((value != null))
+					{
+						value.CategorySettings.Add(this);
+						this._categoryId = value.id;
+					}
+					else
+					{
+						this._categoryId = default(int);
+					}
+					this.SendPropertyChanged("Category");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 	
@@ -768,6 +1188,157 @@ namespace WebsiteBlogCMS.Data
 		}
 	}
 	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.EditorsPicks")]
+	public partial class EditorsPick : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private int _postId;
+		
+		private int _position;
+		
+		private EntityRef<Post> _Post;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnpostIdChanging(int value);
+    partial void OnpostIdChanged();
+    partial void OnpositionChanging(int value);
+    partial void OnpositionChanged();
+    #endregion
+		
+		public EditorsPick()
+		{
+			this._Post = default(EntityRef<Post>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_postId", DbType="Int NOT NULL")]
+		public int postId
+		{
+			get
+			{
+				return this._postId;
+			}
+			set
+			{
+				if ((this._postId != value))
+				{
+					if (this._Post.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnpostIdChanging(value);
+					this.SendPropertyChanging();
+					this._postId = value;
+					this.SendPropertyChanged("postId");
+					this.OnpostIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_position", DbType="Int NOT NULL")]
+		public int position
+		{
+			get
+			{
+				return this._position;
+			}
+			set
+			{
+				if ((this._position != value))
+				{
+					this.OnpositionChanging(value);
+					this.SendPropertyChanging();
+					this._position = value;
+					this.SendPropertyChanged("position");
+					this.OnpositionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_EditorsPick", Storage="_Post", ThisKey="postId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public Post Post
+		{
+			get
+			{
+				return this._Post.Entity;
+			}
+			set
+			{
+				Post previousValue = this._Post.Entity;
+				if (((previousValue != value) 
+							|| (this._Post.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Post.Entity = null;
+						previousValue.EditorsPicks.Remove(this);
+					}
+					this._Post.Entity = value;
+					if ((value != null))
+					{
+						value.EditorsPicks.Add(this);
+						this._postId = value.id;
+					}
+					else
+					{
+						this._postId = default(int);
+					}
+					this.SendPropertyChanged("Post");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Post")]
 	public partial class Post : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -790,11 +1361,21 @@ namespace WebsiteBlogCMS.Data
 		
 		private string _content;
 		
+		private int _viewCount;
+		
+		private bool _isVisible;
+		
 		private EntitySet<Comment> _Comments;
+		
+		private EntitySet<EditorsPick> _EditorsPicks;
 		
 		private EntitySet<PostCategory> _PostCategories;
 		
 		private EntitySet<PostTag> _PostTags;
+		
+		private EntitySet<TopMonthPick> _TopMonthPicks;
+		
+		private EntitySet<TopPick> _TopPicks;
 		
 		private EntityRef<User> _User;
 		
@@ -818,13 +1399,20 @@ namespace WebsiteBlogCMS.Data
     partial void OnpublishedAtChanged();
     partial void OncontentChanging(string value);
     partial void OncontentChanged();
+    partial void OnviewCountChanging(int value);
+    partial void OnviewCountChanged();
+    partial void OnisVisibleChanging(bool value);
+    partial void OnisVisibleChanged();
     #endregion
 		
 		public Post()
 		{
 			this._Comments = new EntitySet<Comment>(new Action<Comment>(this.attach_Comments), new Action<Comment>(this.detach_Comments));
+			this._EditorsPicks = new EntitySet<EditorsPick>(new Action<EditorsPick>(this.attach_EditorsPicks), new Action<EditorsPick>(this.detach_EditorsPicks));
 			this._PostCategories = new EntitySet<PostCategory>(new Action<PostCategory>(this.attach_PostCategories), new Action<PostCategory>(this.detach_PostCategories));
 			this._PostTags = new EntitySet<PostTag>(new Action<PostTag>(this.attach_PostTags), new Action<PostTag>(this.detach_PostTags));
+			this._TopMonthPicks = new EntitySet<TopMonthPick>(new Action<TopMonthPick>(this.attach_TopMonthPicks), new Action<TopMonthPick>(this.detach_TopMonthPicks));
+			this._TopPicks = new EntitySet<TopPick>(new Action<TopPick>(this.attach_TopPicks), new Action<TopPick>(this.detach_TopPicks));
 			this._User = default(EntityRef<User>);
 			OnCreated();
 		}
@@ -993,6 +1581,46 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_viewCount", DbType="Int NOT NULL")]
+		public int viewCount
+		{
+			get
+			{
+				return this._viewCount;
+			}
+			set
+			{
+				if ((this._viewCount != value))
+				{
+					this.OnviewCountChanging(value);
+					this.SendPropertyChanging();
+					this._viewCount = value;
+					this.SendPropertyChanged("viewCount");
+					this.OnviewCountChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_isVisible", DbType="Bit NOT NULL")]
+		public bool isVisible
+		{
+			get
+			{
+				return this._isVisible;
+			}
+			set
+			{
+				if ((this._isVisible != value))
+				{
+					this.OnisVisibleChanging(value);
+					this.SendPropertyChanging();
+					this._isVisible = value;
+					this.SendPropertyChanged("isVisible");
+					this.OnisVisibleChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_Comment", Storage="_Comments", ThisKey="id", OtherKey="postId")]
 		public EntitySet<Comment> Comments
 		{
@@ -1003,6 +1631,19 @@ namespace WebsiteBlogCMS.Data
 			set
 			{
 				this._Comments.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_EditorsPick", Storage="_EditorsPicks", ThisKey="id", OtherKey="postId")]
+		public EntitySet<EditorsPick> EditorsPicks
+		{
+			get
+			{
+				return this._EditorsPicks;
+			}
+			set
+			{
+				this._EditorsPicks.Assign(value);
 			}
 		}
 		
@@ -1032,7 +1673,33 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Post", Storage="_User", ThisKey="authorId", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_TopMonthPick", Storage="_TopMonthPicks", ThisKey="id", OtherKey="postId")]
+		public EntitySet<TopMonthPick> TopMonthPicks
+		{
+			get
+			{
+				return this._TopMonthPicks;
+			}
+			set
+			{
+				this._TopMonthPicks.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_TopPick", Storage="_TopPicks", ThisKey="id", OtherKey="postId")]
+		public EntitySet<TopPick> TopPicks
+		{
+			get
+			{
+				return this._TopPicks;
+			}
+			set
+			{
+				this._TopPicks.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Post", Storage="_User", ThisKey="authorId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
 		public User User
 		{
 			get
@@ -1098,6 +1765,18 @@ namespace WebsiteBlogCMS.Data
 			entity.Post = null;
 		}
 		
+		private void attach_EditorsPicks(EditorsPick entity)
+		{
+			this.SendPropertyChanging();
+			entity.Post = this;
+		}
+		
+		private void detach_EditorsPicks(EditorsPick entity)
+		{
+			this.SendPropertyChanging();
+			entity.Post = null;
+		}
+		
 		private void attach_PostCategories(PostCategory entity)
 		{
 			this.SendPropertyChanging();
@@ -1117,6 +1796,30 @@ namespace WebsiteBlogCMS.Data
 		}
 		
 		private void detach_PostTags(PostTag entity)
+		{
+			this.SendPropertyChanging();
+			entity.Post = null;
+		}
+		
+		private void attach_TopMonthPicks(TopMonthPick entity)
+		{
+			this.SendPropertyChanging();
+			entity.Post = this;
+		}
+		
+		private void detach_TopMonthPicks(TopMonthPick entity)
+		{
+			this.SendPropertyChanging();
+			entity.Post = null;
+		}
+		
+		private void attach_TopPicks(TopPick entity)
+		{
+			this.SendPropertyChanging();
+			entity.Post = this;
+		}
+		
+		private void detach_TopPicks(TopPick entity)
 		{
 			this.SendPropertyChanging();
 			entity.Post = null;
@@ -1202,7 +1905,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Category_PostCategory", Storage="_Category", ThisKey="categoryId", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Category_PostCategory", Storage="_Category", ThisKey="categoryId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
 		public Category Category
 		{
 			get
@@ -1236,7 +1939,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_PostCategory", Storage="_Post", ThisKey="postId", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_PostCategory", Storage="_Post", ThisKey="postId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
 		public Post Post
 		{
 			get
@@ -1370,7 +2073,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_PostTag", Storage="_Post", ThisKey="postId", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_PostTag", Storage="_Post", ThisKey="postId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
 		public Post Post
 		{
 			get
@@ -1404,7 +2107,7 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Tag_PostTag", Storage="_Tag", ThisKey="tagId", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Tag_PostTag", Storage="_Tag", ThisKey="tagId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
 		public Tag Tag
 		{
 			get
@@ -1456,6 +2159,258 @@ namespace WebsiteBlogCMS.Data
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Role")]
+	public partial class Role : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _name;
+		
+		private EntitySet<User> _Users;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnnameChanging(string value);
+    partial void OnnameChanged();
+    #endregion
+		
+		public Role()
+		{
+			this._Users = new EntitySet<User>(new Action<User>(this.attach_Users), new Action<User>(this.detach_Users));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_name", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		public string name
+		{
+			get
+			{
+				return this._name;
+			}
+			set
+			{
+				if ((this._name != value))
+				{
+					this.OnnameChanging(value);
+					this.SendPropertyChanging();
+					this._name = value;
+					this.SendPropertyChanged("name");
+					this.OnnameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Role_User", Storage="_Users", ThisKey="id", OtherKey="roleId")]
+		public EntitySet<User> Users
+		{
+			get
+			{
+				return this._Users;
+			}
+			set
+			{
+				this._Users.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Users(User entity)
+		{
+			this.SendPropertyChanging();
+			entity.Role = this;
+		}
+		
+		private void detach_Users(User entity)
+		{
+			this.SendPropertyChanging();
+			entity.Role = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Slider")]
+	public partial class Slider : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _title;
+		
+		private string _description;
+		
+		private EntitySet<SliderPick> _SliderPicks;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OntitleChanging(string value);
+    partial void OntitleChanged();
+    partial void OndescriptionChanging(string value);
+    partial void OndescriptionChanged();
+    #endregion
+		
+		public Slider()
+		{
+			this._SliderPicks = new EntitySet<SliderPick>(new Action<SliderPick>(this.attach_SliderPicks), new Action<SliderPick>(this.detach_SliderPicks));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_title", DbType="VarChar(255) NOT NULL", CanBeNull=false)]
+		public string title
+		{
+			get
+			{
+				return this._title;
+			}
+			set
+			{
+				if ((this._title != value))
+				{
+					this.OntitleChanging(value);
+					this.SendPropertyChanging();
+					this._title = value;
+					this.SendPropertyChanged("title");
+					this.OntitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_description", DbType="VarChar(MAX) NOT NULL", CanBeNull=false)]
+		public string description
+		{
+			get
+			{
+				return this._description;
+			}
+			set
+			{
+				if ((this._description != value))
+				{
+					this.OndescriptionChanging(value);
+					this.SendPropertyChanging();
+					this._description = value;
+					this.SendPropertyChanged("description");
+					this.OndescriptionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Slider_SliderPick", Storage="_SliderPicks", ThisKey="id", OtherKey="sliderId")]
+		public EntitySet<SliderPick> SliderPicks
+		{
+			get
+			{
+				return this._SliderPicks;
+			}
+			set
+			{
+				this._SliderPicks.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_SliderPicks(SliderPick entity)
+		{
+			this.SendPropertyChanging();
+			entity.Slider = this;
+		}
+		
+		private void detach_SliderPicks(SliderPick entity)
+		{
+			this.SendPropertyChanging();
+			entity.Slider = null;
 		}
 	}
 	
@@ -1573,6 +2528,459 @@ namespace WebsiteBlogCMS.Data
 		}
 	}
 	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TopMonthPicks")]
+	public partial class TopMonthPick : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private int _postId;
+		
+		private int _position;
+		
+		private EntityRef<Post> _Post;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnpostIdChanging(int value);
+    partial void OnpostIdChanged();
+    partial void OnpositionChanging(int value);
+    partial void OnpositionChanged();
+    #endregion
+		
+		public TopMonthPick()
+		{
+			this._Post = default(EntityRef<Post>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_postId", DbType="Int NOT NULL")]
+		public int postId
+		{
+			get
+			{
+				return this._postId;
+			}
+			set
+			{
+				if ((this._postId != value))
+				{
+					if (this._Post.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnpostIdChanging(value);
+					this.SendPropertyChanging();
+					this._postId = value;
+					this.SendPropertyChanged("postId");
+					this.OnpostIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_position", DbType="Int NOT NULL")]
+		public int position
+		{
+			get
+			{
+				return this._position;
+			}
+			set
+			{
+				if ((this._position != value))
+				{
+					this.OnpositionChanging(value);
+					this.SendPropertyChanging();
+					this._position = value;
+					this.SendPropertyChanged("position");
+					this.OnpositionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_TopMonthPick", Storage="_Post", ThisKey="postId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public Post Post
+		{
+			get
+			{
+				return this._Post.Entity;
+			}
+			set
+			{
+				Post previousValue = this._Post.Entity;
+				if (((previousValue != value) 
+							|| (this._Post.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Post.Entity = null;
+						previousValue.TopMonthPicks.Remove(this);
+					}
+					this._Post.Entity = value;
+					if ((value != null))
+					{
+						value.TopMonthPicks.Add(this);
+						this._postId = value.id;
+					}
+					else
+					{
+						this._postId = default(int);
+					}
+					this.SendPropertyChanged("Post");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.TopPicks")]
+	public partial class TopPick : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private int _postId;
+		
+		private int _position;
+		
+		private EntityRef<Post> _Post;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnpostIdChanging(int value);
+    partial void OnpostIdChanged();
+    partial void OnpositionChanging(int value);
+    partial void OnpositionChanged();
+    #endregion
+		
+		public TopPick()
+		{
+			this._Post = default(EntityRef<Post>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_postId", DbType="Int NOT NULL")]
+		public int postId
+		{
+			get
+			{
+				return this._postId;
+			}
+			set
+			{
+				if ((this._postId != value))
+				{
+					if (this._Post.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnpostIdChanging(value);
+					this.SendPropertyChanging();
+					this._postId = value;
+					this.SendPropertyChanged("postId");
+					this.OnpostIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_position", DbType="Int NOT NULL")]
+		public int position
+		{
+			get
+			{
+				return this._position;
+			}
+			set
+			{
+				if ((this._position != value))
+				{
+					this.OnpositionChanging(value);
+					this.SendPropertyChanging();
+					this._position = value;
+					this.SendPropertyChanged("position");
+					this.OnpositionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Post_TopPick", Storage="_Post", ThisKey="postId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public Post Post
+		{
+			get
+			{
+				return this._Post.Entity;
+			}
+			set
+			{
+				Post previousValue = this._Post.Entity;
+				if (((previousValue != value) 
+							|| (this._Post.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Post.Entity = null;
+						previousValue.TopPicks.Remove(this);
+					}
+					this._Post.Entity = value;
+					if ((value != null))
+					{
+						value.TopPicks.Add(this);
+						this._postId = value.id;
+					}
+					else
+					{
+						this._postId = default(int);
+					}
+					this.SendPropertyChanged("Post");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.SliderPicks")]
+	public partial class SliderPick : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private int _sliderId;
+		
+		private int _position;
+		
+		private EntityRef<Slider> _Slider;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnsliderIdChanging(int value);
+    partial void OnsliderIdChanged();
+    partial void OnpositionChanging(int value);
+    partial void OnpositionChanged();
+    #endregion
+		
+		public SliderPick()
+		{
+			this._Slider = default(EntityRef<Slider>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_sliderId", DbType="Int NOT NULL")]
+		public int sliderId
+		{
+			get
+			{
+				return this._sliderId;
+			}
+			set
+			{
+				if ((this._sliderId != value))
+				{
+					if (this._Slider.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnsliderIdChanging(value);
+					this.SendPropertyChanging();
+					this._sliderId = value;
+					this.SendPropertyChanged("sliderId");
+					this.OnsliderIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_position", DbType="Int NOT NULL")]
+		public int position
+		{
+			get
+			{
+				return this._position;
+			}
+			set
+			{
+				if ((this._position != value))
+				{
+					this.OnpositionChanging(value);
+					this.SendPropertyChanging();
+					this._position = value;
+					this.SendPropertyChanged("position");
+					this.OnpositionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Slider_SliderPick", Storage="_Slider", ThisKey="sliderId", OtherKey="id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public Slider Slider
+		{
+			get
+			{
+				return this._Slider.Entity;
+			}
+			set
+			{
+				Slider previousValue = this._Slider.Entity;
+				if (((previousValue != value) 
+							|| (this._Slider.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Slider.Entity = null;
+						previousValue.SliderPicks.Remove(this);
+					}
+					this._Slider.Entity = value;
+					if ((value != null))
+					{
+						value.SliderPicks.Add(this);
+						this._sliderId = value.id;
+					}
+					else
+					{
+						this._sliderId = default(int);
+					}
+					this.SendPropertyChanged("Slider");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.[User]")]
 	public partial class User : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1601,11 +3009,11 @@ namespace WebsiteBlogCMS.Data
 		
 		private string _activationLink;
 		
+		private EntitySet<UserToken> _UserTokens;
+		
 		private EntitySet<Comment> _Comments;
 		
 		private EntitySet<Post> _Posts;
-		
-		private EntitySet<UserToken> _UserTokens;
 		
 		private EntityRef<Role> _Role;
 		
@@ -1639,9 +3047,9 @@ namespace WebsiteBlogCMS.Data
 		
 		public User()
 		{
+			this._UserTokens = new EntitySet<UserToken>(new Action<UserToken>(this.attach_UserTokens), new Action<UserToken>(this.detach_UserTokens));
 			this._Comments = new EntitySet<Comment>(new Action<Comment>(this.attach_Comments), new Action<Comment>(this.detach_Comments));
 			this._Posts = new EntitySet<Post>(new Action<Post>(this.attach_Posts), new Action<Post>(this.detach_Posts));
-			this._UserTokens = new EntitySet<UserToken>(new Action<UserToken>(this.attach_UserTokens), new Action<UserToken>(this.detach_UserTokens));
 			this._Role = default(EntityRef<Role>);
 			OnCreated();
 		}
@@ -1870,6 +3278,19 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_UserToken", Storage="_UserTokens", ThisKey="id", OtherKey="userId")]
+		public EntitySet<UserToken> UserTokens
+		{
+			get
+			{
+				return this._UserTokens;
+			}
+			set
+			{
+				this._UserTokens.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Comment", Storage="_Comments", ThisKey="id", OtherKey="authorId")]
 		public EntitySet<Comment> Comments
 		{
@@ -1893,19 +3314,6 @@ namespace WebsiteBlogCMS.Data
 			set
 			{
 				this._Posts.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_UserToken", Storage="_UserTokens", ThisKey="id", OtherKey="userId")]
-		public EntitySet<UserToken> UserTokens
-		{
-			get
-			{
-				return this._UserTokens;
-			}
-			set
-			{
-				this._UserTokens.Assign(value);
 			}
 		}
 		
@@ -1963,6 +3371,18 @@ namespace WebsiteBlogCMS.Data
 			}
 		}
 		
+		private void attach_UserTokens(UserToken entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_UserTokens(UserToken entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+		
 		private void attach_Comments(Comment entity)
 		{
 			this.SendPropertyChanging();
@@ -1985,307 +3405,6 @@ namespace WebsiteBlogCMS.Data
 		{
 			this.SendPropertyChanging();
 			entity.User = null;
-		}
-		
-		private void attach_UserTokens(UserToken entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = this;
-		}
-		
-		private void detach_UserTokens(UserToken entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = null;
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Role")]
-	public partial class Role : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _id;
-		
-		private string _name;
-		
-		private EntitySet<User> _Users;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnidChanging(int value);
-    partial void OnidChanged();
-    partial void OnnameChanging(string value);
-    partial void OnnameChanged();
-    #endregion
-		
-		public Role()
-		{
-			this._Users = new EntitySet<User>(new Action<User>(this.attach_Users), new Action<User>(this.detach_Users));
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int id
-		{
-			get
-			{
-				return this._id;
-			}
-			set
-			{
-				if ((this._id != value))
-				{
-					this.OnidChanging(value);
-					this.SendPropertyChanging();
-					this._id = value;
-					this.SendPropertyChanged("id");
-					this.OnidChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_name", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
-		public string name
-		{
-			get
-			{
-				return this._name;
-			}
-			set
-			{
-				if ((this._name != value))
-				{
-					this.OnnameChanging(value);
-					this.SendPropertyChanging();
-					this._name = value;
-					this.SendPropertyChanged("name");
-					this.OnnameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Role_User", Storage="_Users", ThisKey="id", OtherKey="roleId")]
-		public EntitySet<User> Users
-		{
-			get
-			{
-				return this._Users;
-			}
-			set
-			{
-				this._Users.Assign(value);
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_Users(User entity)
-		{
-			this.SendPropertyChanging();
-			entity.Role = this;
-		}
-		
-		private void detach_Users(User entity)
-		{
-			this.SendPropertyChanging();
-			entity.Role = null;
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.UserTokens")]
-	public partial class UserToken : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _id;
-		
-		private int _userId;
-		
-		private string _token;
-		
-		private System.DateTime _expireDate;
-		
-		private EntityRef<User> _User;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnidChanging(int value);
-    partial void OnidChanged();
-    partial void OnuserIdChanging(int value);
-    partial void OnuserIdChanged();
-    partial void OntokenChanging(string value);
-    partial void OntokenChanged();
-    partial void OnexpireDateChanging(System.DateTime value);
-    partial void OnexpireDateChanged();
-    #endregion
-		
-		public UserToken()
-		{
-			this._User = default(EntityRef<User>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int id
-		{
-			get
-			{
-				return this._id;
-			}
-			set
-			{
-				if ((this._id != value))
-				{
-					this.OnidChanging(value);
-					this.SendPropertyChanging();
-					this._id = value;
-					this.SendPropertyChanged("id");
-					this.OnidChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_userId", DbType="Int NOT NULL")]
-		public int userId
-		{
-			get
-			{
-				return this._userId;
-			}
-			set
-			{
-				if ((this._userId != value))
-				{
-					if (this._User.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnuserIdChanging(value);
-					this.SendPropertyChanging();
-					this._userId = value;
-					this.SendPropertyChanged("userId");
-					this.OnuserIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_token", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
-		public string token
-		{
-			get
-			{
-				return this._token;
-			}
-			set
-			{
-				if ((this._token != value))
-				{
-					this.OntokenChanging(value);
-					this.SendPropertyChanging();
-					this._token = value;
-					this.SendPropertyChanged("token");
-					this.OntokenChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_expireDate", DbType="DateTime NOT NULL")]
-		public System.DateTime expireDate
-		{
-			get
-			{
-				return this._expireDate;
-			}
-			set
-			{
-				if ((this._expireDate != value))
-				{
-					this.OnexpireDateChanging(value);
-					this.SendPropertyChanging();
-					this._expireDate = value;
-					this.SendPropertyChanged("expireDate");
-					this.OnexpireDateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_UserToken", Storage="_User", ThisKey="userId", OtherKey="id", IsForeignKey=true)]
-		public User User
-		{
-			get
-			{
-				return this._User.Entity;
-			}
-			set
-			{
-				User previousValue = this._User.Entity;
-				if (((previousValue != value) 
-							|| (this._User.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._User.Entity = null;
-						previousValue.UserTokens.Remove(this);
-					}
-					this._User.Entity = value;
-					if ((value != null))
-					{
-						value.UserTokens.Add(this);
-						this._userId = value.id;
-					}
-					else
-					{
-						this._userId = default(int);
-					}
-					this.SendPropertyChanged("User");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
 		}
 	}
 }

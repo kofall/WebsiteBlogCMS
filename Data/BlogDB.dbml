@@ -6,8 +6,26 @@
       <Column Name="title" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
       <Column Name="content" Type="System.String" DbType="VarChar(MAX) NOT NULL" CanBeNull="false" />
       <Association Name="Category_Category" Member="Categories" ThisKey="id" OtherKey="parentId" Type="Category" />
+      <Association Name="Category_CategorySetting" Member="CategorySettings" ThisKey="id" OtherKey="categoryId" Type="CategorySetting" />
       <Association Name="Category_PostCategory" Member="PostCategories" ThisKey="id" OtherKey="categoryId" Type="PostCategory" />
       <Association Name="Category_Category" Member="Category1" ThisKey="parentId" OtherKey="id" Type="Category" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UserTokens" Member="UserTokens">
+    <Type Name="UserToken">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="userId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="token" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="expireDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="User_UserToken" Member="User" ThisKey="userId" OtherKey="id" Type="User" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.CategorySettings" Member="CategorySettings">
+    <Type Name="CategorySetting">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="categoryId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="position" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Category_CategorySetting" Member="Category" ThisKey="categoryId" OtherKey="id" Type="Category" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.Comment" Member="Comments">
@@ -26,6 +44,14 @@
       <Association Name="User_Comment" Member="User" ThisKey="authorId" OtherKey="id" Type="User" IsForeignKey="true" />
     </Type>
   </Table>
+  <Table Name="dbo.EditorsPicks" Member="EditorsPicks">
+    <Type Name="EditorsPick">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="postId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="position" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Post_EditorsPick" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
   <Table Name="dbo.Post" Member="Posts">
     <Type Name="Post">
       <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -36,26 +62,46 @@
       <Column Name="updatedAt" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
       <Column Name="publishedAt" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
       <Column Name="content" Type="System.String" DbType="VarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="viewCount" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="isVisible" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
       <Association Name="Post_Comment" Member="Comments" ThisKey="id" OtherKey="postId" Type="Comment" />
+      <Association Name="Post_EditorsPick" Member="EditorsPicks" ThisKey="id" OtherKey="postId" Type="EditorsPick" />
       <Association Name="Post_PostCategory" Member="PostCategories" ThisKey="id" OtherKey="postId" Type="PostCategory" />
       <Association Name="Post_PostTag" Member="PostTags" ThisKey="id" OtherKey="postId" Type="PostTag" />
-      <Association Name="User_Post" Member="User" ThisKey="authorId" OtherKey="id" Type="User" IsForeignKey="true" />
+      <Association Name="Post_TopMonthPick" Member="TopMonthPicks" ThisKey="id" OtherKey="postId" Type="TopMonthPick" />
+      <Association Name="Post_TopPick" Member="TopPicks" ThisKey="id" OtherKey="postId" Type="TopPick" />
+      <Association Name="User_Post" Member="User" ThisKey="authorId" OtherKey="id" Type="User" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.PostCategory" Member="PostCategories">
     <Type Name="PostCategory">
       <Column Name="postId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="categoryId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Association Name="Category_PostCategory" Member="Category" ThisKey="categoryId" OtherKey="id" Type="Category" IsForeignKey="true" />
-      <Association Name="Post_PostCategory" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" />
+      <Association Name="Category_PostCategory" Member="Category" ThisKey="categoryId" OtherKey="id" Type="Category" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+      <Association Name="Post_PostCategory" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.PostTag" Member="PostTags">
     <Type Name="PostTag">
       <Column Name="postId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="tagId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Association Name="Post_PostTag" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" />
-      <Association Name="Tag_PostTag" Member="Tag" ThisKey="tagId" OtherKey="id" Type="Tag" IsForeignKey="true" />
+      <Association Name="Post_PostTag" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+      <Association Name="Tag_PostTag" Member="Tag" ThisKey="tagId" OtherKey="id" Type="Tag" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Role" Member="Roles">
+    <Type Name="Role">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="name" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Association Name="Role_User" Member="Users" ThisKey="id" OtherKey="roleId" Type="User" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Slider" Member="Sliders">
+    <Type Name="Slider">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="title" Type="System.String" DbType="VarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="description" Type="System.String" DbType="VarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Association Name="Slider_SliderPick" Member="SliderPicks" ThisKey="id" OtherKey="sliderId" Type="SliderPick" />
     </Type>
   </Table>
   <Table Name="dbo.Tag" Member="Tags">
@@ -63,6 +109,30 @@
       <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="title" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
       <Association Name="Tag_PostTag" Member="PostTags" ThisKey="id" OtherKey="tagId" Type="PostTag" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TopMonthPicks" Member="TopMonthPicks">
+    <Type Name="TopMonthPick">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="postId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="position" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Post_TopMonthPick" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TopPicks" Member="TopPicks">
+    <Type Name="TopPick">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="postId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="position" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Post_TopPick" Member="Post" ThisKey="postId" OtherKey="id" Type="Post" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.SliderPicks" Member="SliderPicks">
+    <Type Name="SliderPick">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="sliderId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="position" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="Slider_SliderPick" Member="Slider" ThisKey="sliderId" OtherKey="id" Type="Slider" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.[User]" Member="Users">
@@ -78,26 +148,10 @@
       <Column Name="profile" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
       <Column Name="profileImage" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX)" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="activationLink" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
+      <Association Name="User_UserToken" Member="UserTokens" ThisKey="id" OtherKey="userId" Type="UserToken" />
       <Association Name="User_Comment" Member="Comments" ThisKey="id" OtherKey="authorId" Type="Comment" />
       <Association Name="User_Post" Member="Posts" ThisKey="id" OtherKey="authorId" Type="Post" />
-      <Association Name="User_UserToken" Member="UserTokens" ThisKey="id" OtherKey="userId" Type="UserToken" />
       <Association Name="Role_User" Member="Role" ThisKey="roleId" OtherKey="id" Type="Role" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Role" Member="Roles">
-    <Type Name="Role">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="name" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
-      <Association Name="Role_User" Member="Users" ThisKey="id" OtherKey="roleId" Type="User" />
-    </Type>
-  </Table>
-  <Table Name="dbo.UserTokens" Member="UserTokens">
-    <Type Name="UserToken">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="userId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="token" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
-      <Column Name="expireDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Association Name="User_UserToken" Member="User" ThisKey="userId" OtherKey="id" Type="User" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

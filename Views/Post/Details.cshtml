@@ -1,8 +1,7 @@
 ﻿@model WebsiteBlogCMS.Data.Post
 
 @{
-    ViewBag.Title = "Details";
-    Layout = "~/Views/_LayoutPage1.cshtml";
+    Layout = "~/Views/_BlogLayoutPage.cshtml";
 }
 
 <!-- single post -->
@@ -11,20 +10,23 @@
         <div class="container">
             <div class="blog-title px-md-5">
                 <h3 class="title-big">
-                    Create an Art that shows the beauty in everyone’s ideas of flaws.
+                    @Model.title
                 </h3>
                 <ul class="blog-list">
                     <li>
-                        <p> Posted on <strong>July 11, 2020</strong></p>
+                        <p> Posted on <strong>@Model.publishedAt</strong></p>
                     </li>
                     <li>
-                        <p> By <a href="@Url.Action("Details", "User", new { id = 0 })"><strong>Charlotte mia</strong></a></p>
+                        <p> By <a href="@Url.Action("Details", "User", new { id = Model.authorId })"><strong>@WebsiteBlogCMS.Classes.DataHelper.GetUserName(Model.authorId)</strong></a></p>
                     </li>
                     <li>
-                        <p> Published in <a href="@Url.Action("Index", "Post", new { category = "Fashion" })"><strong>Fashion</strong></a></p>
-                    </li>
-                    <li>
-                        <p><strong>1 min read</strong></p>
+                        <p>
+                            Published in
+                            @foreach (var category in Model.PostCategories)
+                            {
+                                <a href="@Url.Action("PostsOfCategory", "Post", new { id = category.categoryId })"><strong>@category.Category.title</strong></a>
+                            }
+                        </p>
                     </li>
                 </ul>
             </div>
@@ -36,30 +38,19 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="text11-content">
-                        <h4 class="mt-sm-3">
-                            How to create an Art that shows the beauty in everyone’s ideas of flaws.
-                        </h4>
-                        <p class="mt-4 mb-3">
-                            Fusce faucibus ante vitae justo efficitur elementum. Donec et ipsum
-                            faucibus
-                            arcu
-                            ipsum elementum, luctus justo. ac purus semper. Fusce faucibus ante vitae justo efficitur
-                            sed et
-                            elementum. Donec ipsum
-                            faucibus arcu elementum, luctus justo. ac purus semper. Fusce faucibus ante vitae justo
-                            efficitur
-                            elementum. Donec ipsum faucibus arcu vitae justo efficitur elementum.
-                        </p>
-                        <ul class="column3 tags m-0 p-0">
-                            <li>
-                                <p class="m-0 mr-sm-4 mr-2">Tags :</p>
-                            </li>
-                            <li><a href="@Url.Action("Index", "Post", new { tag = "Tag1" })" class="btn-small">Tag1</a></li>
-                            <li><a href="@Url.Action("Index", "Post", new { tag = "Tag2" })" class="btn-small">Tag2</a></li>
+                        @Html.Raw(Model.content)
 
-                        </ul>
-                        @Html.ActionLink("Edit", "Edit", "Post", new { id = 0 }, new { @class = "btn btn-style btn-primary mt-4" })
-                        @Html.ActionLink("Delete", "Delete", "Post", new { id = 0 }, new { @class = "btn btn-style btn-primary mt-4" })
+                        <div class="social-share-blog mt-5">
+                            <ul class="column3 tags m-0 p-0">
+                                <li>
+                                    <p class="m-0 mr-sm-4 mr-2">Tags :</p>
+                                </li>
+                                @foreach (var tag in Model.PostTags)
+                                {
+                                    <a href="@Url.Action("PostsOfTag", "Post", new { id = tag.tagId })" class="btn-small"><strong>@tag.Tag.title</strong></a>
+                                }
+                            </ul>
+                        </div>
                     </div>
 
 
@@ -163,20 +154,19 @@
                         <div class="sidebar-widget sidebar-blog-category">
                             <div class="author">
                                 <div class="sidebar-title">
-                                    <h4>About author</h4>
+                                    <h4>O autorze</h4>
                                 </div>
                                 <div class="author-detalis">
-                                    <a href="@Url.Action("Details", "User", new { id = 0 })" class="author-image">
+                                    <a href="@Url.Action("Details", "User", new { id = Model.authorId })" class="author-image">
                                         <img src="~/images/a2.jpg"
                                              alt="author image" class="img-fluid">
                                     </a>
                                     <div class="author-info">
-                                        <a href="@Url.Action("Details", "User", new { id = 0 })" class="author-name">Isabella</a>
+                                        <a href="@Url.Action("Details", "User", new { id = Model.authorId })" class="author-name">@WebsiteBlogCMS.Classes.DataHelper.GetUserName(Model.authorId)</a>
                                     </div>
                                 </div>
                                 <p class="mt-2">
-                                    I am a Fashion designer, Makeup artist, and Blog
-                                    writer.
+                                    @Model.User.intro
                                 </p>
                             </div>
                         </div>
@@ -184,13 +174,13 @@
                         <!--Blog Category Widget-->
                         <div class="sidebar-widget sidebar-blog-category">
                             <div class="sidebar-title">
-                                <h4>Categories</h4>
+                                <h4>Zobacz również</h4>
                             </div>
                             <ul class="blog-cat">
-                                <li><a href="@Url.Action("Index", "Post", new { category = "Beauty" })">Beauty </a></li>
-                                <li><a href="@Url.Action("Index", "Post", new { category = "Fashion" })">Fashion and Style</a></li>
-                                <li><a href="@Url.Action("Index", "Post", new { category = "Food-and-wellness" })">Food and wellness</a></li>
-                                <li><a href="@Url.Action("Index", "Post", new { category = "Lifestyle" })">Lifestyle</a></li>
+                                @foreach (var category in ViewBag.Categories)
+                                {
+                                    <li><a href="@Url.Action("PostsOfCategory", "Post", new { id = category.id })">@category.title </a></li>
+                                }
                             </ul>
                         </div>
 
@@ -198,33 +188,26 @@
                         <!-- Popular Post Widget-->
                         <div class="sidebar-widget popular-posts">
                             <div class="sidebar-title">
-                                <h4>Recent Posts</h4>
+                                <h4>Posty użytkownika</h4>
                             </div>
 
-                            <article class="post">
-                                <figure class="post-thumb"><img src="~/images/beauty8.jpg" alt=""></figure>
-                                <div class="text">
-                                    @Html.ActionLink("4 Ways to feel Great during the Cold Weather", "Details", "Post", new { id = 0 }, null);
-                                </div>
-                                <div class="post-info">June 14, 2020</div>
-                            </article>
-
-                            <article class="post">
-                                <figure class="post-thumb"><img src="~/images/food3.jpg" alt=""></figure>
-                                <div class="text">
-                                    @Html.ActionLink("How to Make the Best Japanese Shokupan Veg Bread", "Details", "Post", new { id = 0 }, null);
-                                </div>
-                                <div class="post-info">June 13, 2020</div>
-                            </article>
-
-                            <article class="post">
-                                <figure class="post-thumb"><img src="~/images/beauty2.jpg" alt=""></figure>
-                                <div class="text">
-                                    @Html.ActionLink("How to get Beautiful coloring Highlights this weak", "Details", "Post", new { id = 0 }, null);
-                                </div>
-                                <div class="post-info">June 12, 2020</div>
-                            </article>
-
+                            @if (ViewBag.UserPosts == null || ViewBag.UserPosts.Count == 0)
+                            {
+                                <p>Brak innych postów.</p>
+                            }
+                            else
+                            {
+                                foreach (var post in ViewBag.UserPosts)
+                                {
+                                    <article class="post">
+                                        <figure class="post-thumb"><img src="~/images/beauty8.jpg" alt=""></figure>
+                                        <div class="text">
+                                            @Html.ActionLink($"{post.title}", "Details", "Post", new { id = post.id }, null)
+                                        </div>
+                                        <div class="post-info">@post.publishedAt</div>
+                                    </article>
+                                }
+                            }
                         </div>
                     </aside>
                 </div>

@@ -1,0 +1,62 @@
+﻿@model WebsiteBlogCMS.Data.User
+
+@{
+    ViewBag.Title = "Settings";
+    Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
+}
+
+<div class="container-fluid p-4">
+    <h1 class="mt-4 mb-4">Ustawienia konta</h1>
+    @Html.Partial("../Shared/_Message")
+    <div class="mb-4">
+        @using (Html.BeginForm("EditSettings", "User", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.id)
+
+            <div class="form-floating mb-3">
+                @Html.EditorFor(model => model.login, new { htmlAttributes = new { @class = "form-control", placeholder = "sample", @disabled = "disabled" } })
+                <label for="login">Login</label>
+                @Html.ValidationMessageFor(model => model.login, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                @Html.DropDownListFor(model => model.roleId, new SelectList(ViewBag.Roles, "id", "name"), "Wybierz rolę", new { @class = "form-control", @disabled = "disabled" })
+                <label asp-for="roleId" class="control-label">Rola</label>
+                @Html.ValidationMessageFor(model => model.roleId, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                @Html.EditorFor(model => model.firstName, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                <label for="login">Imię</label>
+                @Html.ValidationMessageFor(model => model.firstName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                @Html.EditorFor(model => model.lastName, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                <label for="login">Nazwisko</label>
+                @Html.ValidationMessageFor(model => model.lastName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                <div class="input-group">
+                    @Html.TextAreaFor(model => model.intro, new { @class = "form-control", @placeholder = "Krótki opis profilu", @rows = "4" })
+                </div>
+                @Html.ValidationMessageFor(model => model.intro, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                <div class="input-group">
+                    @Html.TextAreaFor(model => model.profile, new { @class = "form-control", @placeholder = "Szczegółowy opis profilu", @rows = "4" })
+                </div>
+                @Html.ValidationMessageFor(model => model.profile, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Zapisz</button>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,121 @@
+﻿@model WebsiteBlogCMS.Data.Post
+
+<link href="~/css/virtual-select.min.css" rel="stylesheet" />
+<script src="~/js/virtual-select.min.js"></script>
+
+@{
+    Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
+}
+
+<script>
+    tinymce.init({
+        selector: 'textarea#tiny',
+        width: '100%',
+        plugins: [
+            'a11ychecker', 'advlist', 'advcode', 'advtable', 'autolink', 'checklist', 'export',
+            'lists', 'link', 'image', 'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks',
+            'powerpaste', 'fullscreen', 'formatpainter', 'insertdatetime', 'media', 'table', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | a11ycheck casechange blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify |' +
+            'bullist numlist checklist outdent indent | removeformat | code table help'
+    })
+</script>
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Utwórz post</h1>
+    @Html.Partial("../Shared/_Message")
+    @using (Html.BeginForm("Create", "Post", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.Hidden("selectedCategories", "", new { id = "SelectedCategories" })
+        @Html.Hidden("selectedTags", "", new { id = "SelectedTags" })
+
+        <div class="form-floating mb-3">
+            @Html.EditorFor(model => model.title, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+            <label for="title">Tytuł</label>
+            @Html.ValidationMessageFor(model => model.title, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-floating mb-3">
+            <div id="categoryMultiselect">
+            </div>
+        </div>
+
+        <div class="form-floating mb-3">
+            <div id="tagMultiselect">
+            </div>
+        </div>
+
+        <div class="form-floating mb-3">
+            <div class="input-group">
+                @Html.TextAreaFor(model => model.content, new { @class = "form-control", @placeholder = "Treść", @rows = "4", @id = "tiny" })
+            </div>
+            @Html.ValidationMessageFor(model => model.content, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="modal-footer">
+            @Html.ActionLink("Anuluj", "Posts", "Admin", null, new { @class = "btn btn-secondary", type = "button" })
+            <button type="submit" class="btn btn-primary">Zapisz</button>
+        </div>
+    }
+</div>
+
+<script>
+    var categoriesOptions = @Html.Raw(ViewBag.Categories);
+
+    VirtualSelect.init({
+        ele: '#categoryMultiselect',
+        options: categoriesOptions,
+        multiple: true,
+        search: true,
+        searchByStartsWith: true,
+        placeholder: 'Wybierz kategorie',
+        allOptionsSelectedText: 'Wszystkie'
+    });
+    document.querySelector('#categoryMultiselect').addEventListener('change', function () {
+        var selectedOptions = this.getSelectedOptions();
+        var selectedValues = Array.from(selectedOptions, option => option.value);
+        var joinedValues = selectedValues.join(',');
+        $('#SelectedCategories').val(joinedValues);
+    });
+
+    var tagsOptions = @Html.Raw(ViewBag.Tags);
+    VirtualSelect.init({
+        ele: '#tagMultiselect',
+        options: tagsOptions,
+        multiple: true,
+        search: true,
+        searchByStartsWith: true,
+        placeholder: 'Wybierz tagi',
+        allOptionsSelectedText: 'Wszystkie'
+    });
+    document.querySelector('#tagMultiselect').addEventListener('change', function () {
+        var selectedOptions = this.getSelectedOptions();
+        var selectedValues = Array.from(selectedOptions, option => option.value);
+        var joinedValues = selectedValues.join(',');
+        $('#SelectedTags').val(joinedValues);
+    });
+</script>
+
+<script>
+    document.addEventListener('focusin', (e) => {
+        if (e.target.closest(".tox-tinymce, .tox-tinymce-aux, .moxman-window, .tam-assetmanager-root") !== null) {
+            e.stopImmediatePropagation();
+        }
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $("#categoryMultiselect").on("click", function () {
+            var dropdownContainer = $(this).find(".vscomp-dropbox-container");
+            dropdownContainer.css("z-index", "9999");
+        });
+    });
+    $(document).ready(function () {
+        $("#tagMultiselect").on("click", function () {
+            var dropdownContainer = $(this).find(".vscomp-dropbox-container");
+            dropdownContainer.css("z-index", "9999");
+        });
+    });
+</script>

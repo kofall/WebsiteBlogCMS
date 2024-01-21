@@ -1,0 +1,18 @@
+﻿@if (TempData[WebsiteBlogCMS.Classes.Enums.Message(WebsiteBlogCMS.Classes.Enums.MessageType.Error)] != null)
+{
+    <div class="alert alert-danger">
+        <strong>Błąd!</strong> @TempData[WebsiteBlogCMS.Classes.Enums.Message(WebsiteBlogCMS.Classes.Enums.MessageType.Error)]
+    </div>
+}
+else if (TempData[WebsiteBlogCMS.Classes.Enums.Message(WebsiteBlogCMS.Classes.Enums.MessageType.Warning)] != null)
+{
+    <div class="alert alert-warning">
+        <strong>Uwaga!</strong> @TempData[WebsiteBlogCMS.Classes.Enums.Message(WebsiteBlogCMS.Classes.Enums.MessageType.Warning)]
+    </div>
+}
+else if (TempData[WebsiteBlogCMS.Classes.Enums.Message(WebsiteBlogCMS.Classes.Enums.MessageType.Success)] != null)
+{
+    <div class="alert alert-success">
+        <strong>Sukces!</strong> @TempData[WebsiteBlogCMS.Classes.Enums.Message(WebsiteBlogCMS.Classes.Enums.MessageType.Success)]
+    </div>
+}

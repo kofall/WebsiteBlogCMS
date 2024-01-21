@@ -1,7 +1,7 @@
-﻿@model WebsiteBlogCMS.Models.PostViewModel
+﻿@model WebsiteBlogCMS.Data.Post
 
-<div class="modal fade" id="DetailPost-@Model.Post.id" aria-labelledby="DetailPostLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="DetailPost-@Model.id" aria-labelledby="DetailPostLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="DetailPostLabel">Szczegóły postu</h5>
@@ -15,23 +15,32 @@
                         Tytuł
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Post.title)
+                        @Html.DisplayFor(model => model.title)
                     </dd>
 
                     <dt class="col-sm-4">
                         Utworzono
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Post.createdAt)
+                        @Html.DisplayFor(model => model.createdAt)
                     </dd>
 
-                    @if (Model.Post.updatedAt != null)
+                    @if (Model.published)
                     {
                         <dt class="col-sm-4">
-                            Ostatnia modyfikacja
+                            Opublikowano dnia
                         </dt>
                         <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Post.updatedAt)
+                            @Html.DisplayFor(model => model.publishedAt)
+                        </dd>
+                    }
+                    else
+                    {
+                        <dt class="col-sm-4">
+                            Status
+                        </dt>
+                        <dd class="col-sm-8">
+                            Nie zatwierdzony
                         </dd>
                     }
 
@@ -39,7 +48,7 @@
                         Widoczny
                     </dt>
                     <dd class="col-sm-8">
-                        @if (!Model.Post.published)
+                        @if (!Model.published)
                         {
                             @:Nie
                         }
@@ -49,73 +58,82 @@
                         }
                     </dd>
 
-                    <dt class="col-sm-5">
+                    @if (Model.updatedAt != null)
+                    {
+                        <dt class="col-sm-4">
+                            Ostatnia modyfikacja
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.updatedAt)
+                        </dd>
+                    }
+
+                    <dt class="col-sm-4">
                         Zatwierdzono dnia
                     </dt>
-                    <dd class="col-sm-7">
-                        @Html.DisplayFor(model => model.Post.publishedAt)
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.publishedAt)
                     </dd>
 
                     <dt class="col-sm-4">
                         Kategorie
                     </dt>
                     <dd class="col-sm-8">
-                        @foreach (var categoryId in Model.SelectedCategories)
-                        {
-                            var categoryName = "";
-                            if (ViewBag.Categories != null)
-                            {
-                                foreach (var category in ViewBag.Categories)
-                                {
-                                    if (category.id == categoryId)
-                                    {
-                                        categoryName = category.title;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!string.IsNullOrEmpty(categoryName))
-                            {
-                                @categoryName
-                            }
-                        }
+                        <div id="selectedCategories"></div>
                     </dd>
-
-                    @*<dt class="col-sm-4">
-                        Tagi
-                    </dt>
-                    <dd class="col-sm-8">
-                        @foreach (var tagId in Model.SelectedTags)
-                        {
-                            @{
-                                var tagName = "";
-                                if (ViewBag.Tags != null)
-                                {
-                                    foreach (var tag in ViewBag.Tags)
-                                    {
-                                        if (tag.id == tagId)
-                                        {
-                                            tagName = tag.title;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            @if (!string.IsNullOrEmpty(tagName))
-                            {
-                                @Html.Display(tagName);
-                            }
-                        }
-                    </dd>*@
 
                     <dt class="col-sm-4">
                         Treść
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Post.content)
+                        <button id="previewButton" type="button" class="btn btn-info">
+                            Podgląd
+                        </button>
                     </dd>
                 </dl>
             </div>
         </div>
     </div>
 </div>
+
+<div id="previewModal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="previewIframe" class="tox-dialog__iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var previewButton = document.getElementById('previewButton');
+    previewButton.addEventListener('click', function () {
+        var previewIframe = document.getElementById('previewIframe');
+        var content = @Html.Raw(ViewBag.Content);
+
+        previewIframe.contentDocument.body.innerHTML = content;
+        previewIframe.style.width = '100%';
+        previewIframe.style.height = '100%';
+
+        var previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+        previewModal.show();
+    });
+</script>
+
+<script>
+    var categoriesOptions = @Html.Raw(ViewBag.Categories);
+
+    categoriesOptions.forEach(function (category) {
+        var selectedCategoriesDiv = $('#selectedCategories');
+        var categoryBox = $('<span class="badge rounded-pill bg-primary m-1"></span>').text(category.label);
+        selectedCategoriesDiv.append(categoryBox);
+    });
+</script>

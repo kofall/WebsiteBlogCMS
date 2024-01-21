@@ -1,20 +1,18 @@
-﻿@model IEnumerable<WebsiteBlogCMS.Data.Tag>
+﻿@model IEnumerable<WebsiteBlogCMS.Data.Slider>
 
 @{
-    ViewBag.Title = "Tagi";
+    ViewBag.Title = "Slajdy";
     Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
 }
 
 <div class="container-fluid px-4">
-    <h1 class="mt-4">Lista tagów</h1>
+    <h1 class="mt-4">Lista slajdów</h1>
     @Html.Partial("../Shared/_Message")
     <div class="card mb-4">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-table me-1"></i> Tagi</span>
-                <button type="button" class="btn btn-success" data-toggle="modal" onclick="loadPartialView('Create', 0)">
-                    Create
-                </button>
+                <span><i class="fas fa-table me-1"></i> Slajdy</span>
+                @Html.ActionLink("Utwórz", "Create", "Slider", null, new { @class = "btn btn-success", type = "button" })
             </div>
         </div>
         <div class="card-body">
@@ -22,7 +20,7 @@
                 <thead>
                     <tr>
                         <th>
-                            Nazwa
+                            Tytuł
                         </th>
                         <th></th>
                     </tr>
@@ -30,7 +28,7 @@
                 <tfoot>
                     <tr>
                         <th>
-                            Nazwa
+                            Tytuł
                         </th>
                         <th></th>
                     </tr>
@@ -43,14 +41,13 @@
                                 @Html.DisplayFor(modelItem => item.title)
                             </td>
                             <td>
-                                <button type="button" class="btn btn-warning" data-toggle="modal" onclick="loadPartialView('Edit', @item.id)">
-                                    Edit
-                                </button>
+                                @Html.ActionLink("Edytuj", "Edit", "Slider", new { id = item.id }, new { @class = "btn btn-warning", type = "button" })
+
                                 <button type="button" class="btn btn-info" data-toggle="modal" onclick="loadPartialView('Detail', @item.id)">
-                                    Detail
+                                    Szczegóły
                                 </button>
                                 <button type="button" class="btn btn-danger" data-toggle="modal" onclick="loadPartialView('Delete', @item.id)">
-                                    Delete
+                                    Usuń
                                 </button>
                             </td>
                         </tr>
@@ -70,7 +67,7 @@
     jQuery.noConflict(); // Use this only once
 
     function loadPartialView(operation, id) {
-        var url = '@Url.Action("LoadPartialView", "Tag")';
+        var url = '@Url.Action("LoadPartialView", "Slider")';
 
         jQuery.ajax({
             url: url,
@@ -78,7 +75,7 @@
             data: { operation: operation, id: id },
             success: function (data) {
                 $('#myModal').html(data);
-                $('#' + operation + 'Tag-' + id).modal('show');
+                $('#' + operation + 'Slider-' + id).modal('show');
             },
             error: function () {
                 alert('Error loading partial view.');

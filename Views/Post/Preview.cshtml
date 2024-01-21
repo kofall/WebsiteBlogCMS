@@ -1,0 +1,112 @@
+﻿@model WebsiteBlogCMS.Data.Post
+
+<link href="~/css/virtual-select.min.css" rel="stylesheet" />
+<script src="~/js/virtual-select.min.js"></script>
+
+@{
+    Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
+}
+
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Szczegóły postu</h1>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Tytuł
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.title)
+        </dd>
+
+        <dt class="col-sm-2">
+            Utworzono
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.createdAt)
+        </dd>
+
+        @if (Model.published)
+        {
+            <dt class="col-sm-2">
+                Opublikowano dnia
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.publishedAt)
+            </dd>
+        }
+        else
+        {
+            <dt class="col-sm-2">
+                Status
+            </dt>
+            <dd class="col-sm-10">
+                Nie zatwierdzony
+            </dd>
+        }
+
+        <dt class="col-sm-2">
+            Widoczny
+        </dt>
+        <dd class="col-sm-10">
+            @if (!Model.published)
+            {
+                @:Nie
+            }
+            else
+            {
+                @:Tak
+            }
+        </dd>
+
+        @if (Model.updatedAt != null)
+        {
+            <dt class="col-sm-2">
+                Ostatnia modyfikacja
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.updatedAt)
+            </dd>
+        }
+
+        <dt class="col-sm-2">
+            Zatwierdzono dnia
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.published)
+            {
+                @Html.DisplayFor(model => model.publishedAt)
+            }
+            else
+            {
+                @:Nie zatwierdzono
+            }
+        </dd>
+
+        <dt class="col-sm-2">
+            Kategorie
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var category in ViewBag.Categories)
+            {
+                <span class="badge rounded-pill bg-primary m-1">@category.title</span>
+            }
+        </dd>
+
+        <dt class="col-sm-2">
+            Tagi
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var tag in ViewBag.Tags)
+            {
+                <span class="badge rounded-pill bg-primary m-1">@tag.title</span>
+            }
+        </dd>
+
+        <dt class="col-sm-2">
+            Treść
+        </dt>
+        <dd class="col-sm-10">
+            @Html.Raw(Model.content)
+        </dd>
+    </dl>
+</div>

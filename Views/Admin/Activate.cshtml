@@ -10,11 +10,8 @@
             <div class="card shadow-lg border-0 rounded-lg mt-5">
                 <div class="card-header"><h3 class="text-center font-weight-light my-4">Aktywuj konto</h3></div>
                 <div class="card-body">
-                    @if(ViewBag.ErrorMessage != null)
-                    {
-                        <p class="text-center text-danger">@ViewBag.ErrorMessage</p>
-                    }
-                    @using (Html.BeginForm("Activate", "User", FormMethod.Post))
+                    @Html.Partial("../Shared/_Message")
+                    @using (Html.BeginForm("Activate", "Admin", FormMethod.Post))
                     {
                         @Html.AntiForgeryToken()
 
@@ -29,7 +26,7 @@
                         </div>
 
                         <div class="form-floating mb-3">
-                            @Html.EditorFor(model => model.passwordHash, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                            @Html.EditorFor(model => model.passwordHash, new { htmlAttributes = new { @class = "form-control", type = "password", placeholder = "sample" } })
                             <label for="passwordHash">Hasło</label>
                             @Html.ValidationMessageFor(model => model.passwordHash, "", new { @class = "text-danger" })
                         </div>

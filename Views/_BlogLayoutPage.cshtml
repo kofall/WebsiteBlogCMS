@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
+    <title>Blog</title>
     <link href="~/css/style-liberty.css" rel="stylesheet" />
     <a href="~/fonts/fontawesome-webfont.eot"></a>
     <a href="~/fonts/fontawesome-webfont.ttf"></a>
@@ -25,22 +25,16 @@
                 <a class="navbar-brand" href="@Url.Action("Index", "Home")">
                     <span class="fa fa-newspaper-o"></span> NewsBlog
                 </a>
-                <!-- if logo is image enable this
-                <a class="navbar-brand" href="#index.html">
-                    <img src="image-path" alt="Your logo" title="Your logo" style="height:35px;" />
-                </a> -->
-
 
                 <button class="navbar-toggler collapsed" type="button" data-toggle="collapse"
                         data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                         aria-label="Toggle navigation">
-                    <!-- <span class="navbar-toggler-icon"></span> -->
                     <span class="fa icon-expand fa-bars"></span>
                     <span class="fa icon-close fa-times"></span>
                 </button>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <nav class="mx-auto">
+                <div class="collapse navbar-collapse ml-5" id="navbarSupportedContent">
+                    <div class="col-lg-8">
                         <div class="search-bar">
                             <form class="search">
                                 <input type="search" class="search__input" name="search" placeholder="Discover news, articles and more"
@@ -48,26 +42,12 @@
                                 <span class="fa fa-search search__icon"></span>
                             </form>
                         </div>
-                    </nav>
-                    <ul class="navbar-nav">
-                        <li>@Html.ActionLink("Home", "Index", "Home", null, new { @class = "nav-link" })</li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                More <span class="fa fa-angle-down"></span>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                @Html.ActionLink("Beauty", "Index", "Post", new { category = "Beauty"}, new { @class = "dropdown-item" })
-                                @Html.ActionLink("Fashion", "Index", "Post", new { category = "Fashion" }, new { @class = "dropdown-item" })
-                            </div>
-                        </li>
-                        <li>@Html.ActionLink("User", "Details", "User", new { id = 0 }, new { @class = "nav-link" })</li>
-                    </ul>
+                    </div>
                 </div>
-            </div>
-        </nav>
-        <!--//nav-->
+            </nav>
+        </div>
     </header>
+
     <!-- //header -->
     <div>
         @RenderBody()
@@ -84,32 +64,6 @@
                             </a>
                             <p class="copy-footer-28"> © 2020. All Rights Reserved. </p>
                             <h5 class="mt-2">Design by <a href="https://w3layouts.com/">W3Layouts</a></h5>
-                        </div>
-                        <div class="col-lg-8 row">
-                            <div class="col-sm-4 col-6 footer-list-28">
-                                <h6 class="footer-title-28">Useful links</h6>
-                                <ul>
-                                    <li><a href="#categories">TODO</a></li>
-                                </ul>
-                            </div>
-                            <div class="col-sm-4 col-6 footer-list-28">
-                                <h6 class="footer-title-28">Categories</h6>
-                                <ul>
-                                    <li><a href="@Url.Action("Index", "Post", new { category = "Beauty" })">Beauty</a></li>
-                                    <li><a href="@Url.Action("Index", "Post", new { category = "Fashion" })">Fashion and Style</a></li>
-                                    <li><a href="@Url.Action("Index", "Post", new { category = "Food-and-wellness" })">Food and Wellness</a></li>
-                                    <li><a href="@Url.Action("Index", "Post", new { category = "Lifestyle" })">Lifestyle</a></li>
-                                </ul>
-                            </div>
-                            <div class="col-sm-4 col-6 footer-list-28 mt-sm-0 mt-4">
-                                <h6 class="footer-title-28">Social Media</h6>
-                                <ul class="social-icons">
-                                    <li class="facebook">
-                                        <a href="#facebook"><span class="fa fa-facebook"></span> Facebook</a>
-                                    </li>
-                                    <li class="twitter"> <a href="#twitter"><span class="fa fa-twitter"></span> Twitter</a></li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 </div>

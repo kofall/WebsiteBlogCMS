@@ -3,6 +3,10 @@
 <link href="~/css/virtual-select.min.css" rel="stylesheet" />
 <script src="~/js/virtual-select.min.js"></script>
 
+@{
+    Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
+}
+
 <script>
     tinymce.init({
         selector: 'textarea#tiny',
@@ -17,60 +21,53 @@
     })
 </script>
 
-<div class="modal fade" id="EditPost-@Model.id" aria-labelledby="EditPostLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="EditPostLabel">Stwórz post</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Utwórz post</h1>
+    @Html.Partial("../Shared/_Message")
+    @using (Html.BeginForm("Edit", "Post", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.Hidden("selectedCategories", "", new { id = "SelectedCategories" })
+        @Html.Hidden("selectedTags", "", new { id = "SelectedTags" })
+        @Html.HiddenFor(model => model.id)
+
+        <div class="form-floating mb-3">
+            @Html.EditorFor(model => model.title, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+            <label for="title">Tytuł</label>
+            @Html.ValidationMessageFor(model => model.title, "", new { @class = "text-danger" })
+        </div>
+
+        if (Model.published)
+        {
+            <div class="form-check form-switch mb-3">
+                @Html.CheckBoxFor(model => model.isVisible, new { @class = "form-check-input", id = "published" })
+                <label class="form-check-label" for="published">Czy post ma być widoczny dla użytkownika?</label>
+                @Html.ValidationMessageFor(model => model.isVisible, "", new { @class = "text-danger" })
             </div>
-            <div class="modal-body">
-                @using (Html.BeginForm("Edit", "Post", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.Hidden("selectedCategories", "", new { id = "SelectedCategories" })
-                    @Html.Hidden("selectedTags", "", new { id = "SelectedTags" })
-                    @Html.HiddenFor(model => model.id)
+        }
 
-                    <div class="form-floating mb-3">
-                        @Html.EditorFor(model => model.title, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
-                        <label for="title">Tytuł</label>
-                        @Html.ValidationMessageFor(model => model.title, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="form-check form-switch mb-3">
-                        @Html.CheckBoxFor(model => model.published, new { @class = "form-check-input", id = "published" })
-                        <label class="form-check-label" for="published">Czy post ma być widoczny dla użytkownika?</label>
-                        @Html.ValidationMessageFor(model => model.published, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <div id="categoryMultiselect">
-                        </div>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <div id="tagMultiselect">
-                        </div>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <div class="input-group">
-                            @Html.TextAreaFor(model => model.content, new { @class = "form-control", @placeholder = "Treść", @rows = "4", @id = "tiny" })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.content, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
-                        <button type="submit" class="btn btn-primary">Zapisz</button>
-                    </div>
-                }
+        <div class="form-floating mb-3">
+            <div id="categoryMultiselect">
             </div>
         </div>
-    </div>
+
+        <div class="form-floating mb-3">
+            <div id="tagMultiselect">
+            </div>
+        </div>
+
+        <div class="form-floating mb-3">
+            <div class="input-group">
+                @Html.TextAreaFor(model => model.content, new { @class = "form-control", @placeholder = "Treść", @rows = "4", @id = "tiny" })
+            </div>
+            @Html.ValidationMessageFor(model => model.content, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="modal-footer">
+            @Html.ActionLink("Anuluj", "Posts", "Admin", null, new { @class = "btn btn-secondary", type = "button" })
+            <button type="submit" class="btn btn-primary">Zapisz</button>
+        </div>
+    }
 </div>
 
 <script>

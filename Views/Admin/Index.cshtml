@@ -1,5 +1,75 @@
-﻿@{
+﻿@model WebsiteBlogCMS.Models.AdminStatistics
+
+@{
     Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
 }
 
-
+<div class="container-fluid px-4">
+    @if (ViewBag.IsUserConfigured)
+    {
+        <h1 class="mt-4">Podsumowanie</h1>
+        @Html.Partial("../Shared/_Message")
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item active">Statystyki</li>
+        </ol>
+        <div class="row">
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body">Liczba użytkowników: <b>@Model.TotalUsers</b></div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        @Html.ActionLink("Szczegóły", "Users", "Admin", null, new { @class = "small text-white stretched-link" })
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-warning text-white mb-4">
+                    <div class="card-body">Liczba postów: <b>@Model.TotalPosts</b></div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        @Html.ActionLink("Szczegóły", "Posts", "Admin", null, new { @class = "small text-white stretched-link" })
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-danger text-white mb-4">
+                    <div class="card-body">Liczba komentarzy: <b>@Model.TotalComments</b></div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        @Html.ActionLink("Szczegóły", "Comments", "Admin", null, new { @class = "small text-white stretched-link" })
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-md-6">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body">Liczba kategorii: <b>@Model.TotalCategories</b></div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        @Html.ActionLink("Szczegóły", "Categories", "Admin", null, new { @class = "small text-white stretched-link" })
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-md-6">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body">Liczba Tagów: <b>@Model.TotalTags</b></div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        @Html.ActionLink("Szczegóły", "Tags", "Admin", null, new { @class = "small text-white stretched-link" })
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <h1 class="mt-4"></h1>
+        @Html.Partial("../Shared/_Message")
+        <div class="d-flex align-items-center justify-content-center" style="min-height: 85vh !important;">
+            <div class="col-md-6 text-center">
+                <h2>Dokończ konfigurację konta</h2>
+                <p>Skonfiguruj swoje konto, aby uzyskać pełny dostęp do funkcji.</p>
+                @Html.ActionLink("Przejdź do ustawień", "Settings", "Admin", new { login = User.Identity.Name }, new { @class = "btn btn-primary" })
+            </div>
+        </div>
+    }
+</div>

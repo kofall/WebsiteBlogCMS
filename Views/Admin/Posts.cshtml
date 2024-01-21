@@ -1,19 +1,17 @@
 ﻿@model IEnumerable<WebsiteBlogCMS.Data.Post>
 
 @{
-    ViewBag.Title = "Posty";
     Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
 }
 
 <div class="container-fluid px-4">
     <h1 class="mt-4">Lista postów</h1>
+    @Html.Partial("../Shared/_Message")
     <div class="card mb-4">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-table me-1"></i> Posty</span>
-                <button type="button" class="btn btn-success" data-toggle="modal" onclick="loadPartialView('Create', 0)">
-                    Create
-                </button>
+                @Html.ActionLink("Utwórz", "Create", "Post", null, new { @class = "btn btn-success", type = "button" })
             </div>
         </div>
         <div class="card-body">
@@ -31,7 +29,7 @@
                             Data utworzenia
                         </th>
                         <th>
-                            Widoczny
+                            Status
                         </th>
                         <th>
                             Data publikacji
@@ -52,7 +50,7 @@
                             Data utworzenia
                         </th>
                         <th>
-                            Widoczny
+                            Status
                         </th>
                         <th>
                             Data publikacji
@@ -74,7 +72,11 @@
                                 @Html.DisplayFor(modelItem => item.createdAt)
                             </td>
                             <td class="text-center align-middle">
-                                @if (item.published)
+                                @if (!item.published)
+                                {
+                                    <p>Nie zatwierdzono</p>
+                                }
+                                else if (item.isVisible)
                                 {
                                     <i class="bi bi-check-circle text-success" style="font-size: 1.5em;"></i> <!-- Check icon -->
                                 }
@@ -87,14 +89,15 @@
                                 @Html.DisplayFor(modelItem => item.publishedAt)
                             </td>
                             <td>
-                                <button type="button" class="btn btn-warning" data-toggle="modal" onclick="loadPartialView('Edit', @item.id)">
-                                    Edit
-                                </button>
-                                <button type="button" class="btn btn-info" data-toggle="modal" onclick="loadPartialView('Detail', @item.id)">
-                                    Detail
-                                </button>
+                                @if (!item.published)
+                                {
+                                    @Html.ActionLink("Zatwierdź", "Confirm", "Post", new { id = item.id }, new { @class = "btn btn-primary", type = "button" })
+                                }
+
+                                @Html.ActionLink("Edytuj", "Edit", "Post", new { id = item.id }, new { @class = "btn btn-warning", type = "button" })
+                                @Html.ActionLink("Szczegóły", "Preview", "Post", new { id = item.id }, new { @class = "btn btn-info", type = "button" })
                                 <button type="button" class="btn btn-danger" data-toggle="modal" onclick="loadPartialView('Delete', @item.id)">
-                                    Delete
+                                    Usuń
                                 </button>
                             </td>
                         </tr>
@@ -114,7 +117,7 @@
     jQuery.noConflict(); // Use this only once
 
     function loadPartialView(operation, id) {
-        var url = '@Url.Action("LoadPostPartialView", "Post")';
+        var url = '@Url.Action("LoadPartialView", "Post")';
 
         jQuery.ajax({
             url: url,
