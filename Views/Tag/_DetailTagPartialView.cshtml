@@ -1,7 +1,7 @@
-﻿@model WebsiteBlogCMS.Data.Tag
+﻿@model WebsiteBlogCMS.Models.Validation.TagModel
 
-<div class="modal fade" id="DetailTag-@Model.id" aria-labelledby="DetailTagLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+<div class="modal fade" id="DetailTag-@Model.Id" aria-labelledby="DetailTagLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="DetailTagLabel">Szczegóły tagu</h5>
@@ -15,7 +15,7 @@
                         Nazwa
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.title)
+                        @Html.DisplayFor(model => model.Title)
                     </dd>
                 </dl>
             </div>

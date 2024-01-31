@@ -1,10 +1,17 @@
-﻿using System;
+﻿using PagedList;
+using System;
 using System.Collections.Generic;
+using System.Data.Linq;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
+using System.Web;
 using System.Web.Mvc;
+using System.Web.Services.Description;
 using WebsiteBlogCMS.Classes;
 using WebsiteBlogCMS.Data;
 using WebsiteBlogCMS.Models;
+using WebsiteBlogCMS.Models.Validation;
 using static WebsiteBlogCMS.Classes.DataHelper;
 using static WebsiteBlogCMS.Classes.Enums;
 
@@ -12,10 +19,21 @@ namespace WebsiteBlogCMS.Controllers
 {
     public class PostController : Controller
     {
-        public ActionResult PostsOfCategory(int id)
+        public ActionResult PostsOfCategory(int id, int? page)
         {
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+
             using (var ctx = DbHelper.DataContext)
             {
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<Post>(x => x.User);
+                options.LoadWith<Post>(x => x.PostTags);
+                options.LoadWith<Post>(x => x.PostCategories);
+                options.LoadWith<PostTag>(x => x.Tag);
+                options.LoadWith<PostCategory>(x => x.Category);
+                ctx.LoadOptions = options;
+
                 Category category = CategoryUtils.GetCategory(ctx, id);
 
                 if (category == null)
@@ -24,15 +42,36 @@ namespace WebsiteBlogCMS.Controllers
                 }
 
                 List<Post> posts = PostUtils.GetPostsByCategory(ctx, category);
-                ViewBag.Title = category.title;
-                return View(posts);
+
+                PostsOfCategoryModel model = new PostsOfCategoryModel();
+                model.Category = category;
+                model.Posts = posts.ToPagedList(pageNumber, pageSize);
+
+                if (category.parentId != null)
+                {
+                    model.ParentCategory = CategoryUtils.GetCategory(ctx, (int)category.parentId);
+                }
+                model.SubCategories = CategoryUtils.GetSubCats(ctx, category);
+
+                return View(model);
             }
         }
 
-        public ActionResult PostsOfTag(int id)
+        public ActionResult PostsOfTag(int id, int? page)
         {
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+
             using (var ctx = DbHelper.DataContext)
             {
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<Post>(x => x.User);
+                options.LoadWith<Post>(x => x.PostTags);
+                options.LoadWith<Post>(x => x.PostCategories);
+                options.LoadWith<PostTag>(x => x.Tag);
+                options.LoadWith<PostCategory>(x => x.Category);
+                ctx.LoadOptions = options;
+
                 Tag tag = TagUtils.GetTag(ctx, id);
 
                 if (tag == null)
@@ -41,8 +80,42 @@ namespace WebsiteBlogCMS.Controllers
                 }
 
                 List<Post> posts = PostUtils.GetPostsByTag(ctx, tag);
-                ViewBag.Title = tag.title;
-                return View(posts);
+
+                PostsOfTagModel model = new PostsOfTagModel();
+                model.Tag = tag;
+                model.Posts = posts.ToPagedList(pageNumber, pageSize);
+
+                return View(model);
+            }
+        }
+
+        private PostDetailsModel GetPostDetails(int id, bool onlyVisible = true)
+        {
+            using (var ctx = DbHelper.DataContext)
+            {
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<Post>(x => x.User);
+                options.LoadWith<Post>(x => x.PostTags);
+                options.LoadWith<Post>(x => x.PostCategories);
+                options.LoadWith<Post>(x => x.Comments);
+                options.LoadWith<PostTag>(x => x.Tag);
+                options.LoadWith<PostCategory>(x => x.Category);
+                ctx.LoadOptions = options;
+
+                Post post = PostUtils.GetPost(ctx, id);
+
+                if (post == null)
+                {
+                    throw new Exception("HttpNotFound");
+                }
+
+                PostDetailsModel model = new PostDetailsModel();
+                model.Post = post;
+                model.UserPosts = PostUtils.GetUserPosts(ctx, post.authorId).Where(x => !x.id.Equals(id)).Take(3).ToList();
+                model.Comments = CommentUtils.GetRootComments(ctx, post);
+                model.CommentsCount = CommentUtils.GetPostComments(ctx, post, onlyVisible).Count();
+
+                return model;
             }
         }
 
@@ -50,17 +123,76 @@ namespace WebsiteBlogCMS.Controllers
         {
             using (var ctx = DbHelper.DataContext)
             {
-                Post post = PostUtils.GetPost(ctx, id);
-
-                if (post == null)
-                {
-                    return View("HttpNotFound");
-                }
+                PostDetailsModel model = GetPostDetails(id);
 
                 ViewBag.Categories = CategoryUtils.GetRootCategories(ctx);
-                ViewBag.UserPosts = PostUtils.GetUserPosts(ctx, post.authorId);
-                return View(post);
+                ViewBag.UserPosts = PostUtils.GetUserPosts(ctx, model.Post.authorId);
+                return View(model);
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult LeaveComment(PostDetailsModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                CommentModel commentModel = model.CommentModel;
+                model = GetPostDetails(model.Post.id);
+                model.CommentModel = commentModel;
+                return View("Details", model);
+            }
+
+            using (var ctx = DbHelper.DataContext)
+            {
+                Comment comment = new Comment();
+                comment.postId = model.Post.id;
+                comment.parentId = model.CommentModel.ParentId;
+                comment.authorName = model.CommentModel.AuthorName;
+                comment.published = true;
+                comment.publishedAt = DateTime.Now;
+                comment.content = model.CommentModel.Content;
+                comment.isVisible = true;
+
+                ctx.Comments.InsertOnSubmit(comment);
+                ctx.SubmitChanges();
+            }
+
+            return RedirectToAction("Details", new { id = model.Post.id });
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult LeavePriorityComment(PostDetailsModel model)
+        {
+            using (var ctx = DbHelper.DataContext)
+            {
+                if (!ModelState.IsValid)
+                {
+                    CommentModel commentModel = model.CommentModel;
+                    model = GetPostDetails(model.Post.id);
+                    model.CommentModel = commentModel;
+                    ViewBag.Categories = PostUtils.GetPostCategories(ctx, model.Post.id);
+                    ViewBag.Tags = PostUtils.GetPostTags(ctx, model.Post.id);
+                    return View("Preview", model);
+                }
+
+                Comment comment = new Comment();
+                comment.postId = model.Post.id;
+                comment.parentId = model.CommentModel.ParentId;
+                comment.authorId = UserUtils.GetUser(User.Identity.Name).id;
+                comment.authorName = model.CommentModel.AuthorName;
+                comment.published = true;
+                comment.publishedAt = DateTime.Now;
+                comment.content = model.CommentModel.Content;
+                comment.isVisible = true;
+
+                ctx.Comments.InsertOnSubmit(comment);
+                ctx.SubmitChanges();
+            }
+
+            return RedirectToAction("Preview", new { id = model.Post.id });
         }
 
         [Authorize]
@@ -102,10 +234,15 @@ namespace WebsiteBlogCMS.Controllers
 
             using (var ctx = DbHelper.DataContext)
             {
-                Post post = PostUtils.GetPost(ctx, id);
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<Post>(x => x.User);
+                options.LoadWith<Post>(x => x.Comments);
+                ctx.LoadOptions = options;
+
+                PostDetailsModel model = GetPostDetails(id, false);
 
                 User me = UserUtils.GetUser(ctx, User.Identity.Name);
-                User author = UserUtils.GetUser(ctx, post.authorId);
+                User author = UserUtils.GetUser(ctx, model.Post.authorId);
                 if (!(me.id == author.id || me.roleId < 3))
                 {
                     TempData[Message(MessageType.Warning)] = "Nie posiadasz uprawnień do wyświetlenia tego artykułu.";
@@ -115,7 +252,7 @@ namespace WebsiteBlogCMS.Controllers
                 ViewBag.Categories = PostUtils.GetPostCategories(ctx, id);
                 ViewBag.Tags = PostUtils.GetPostTags(ctx, id);
 
-                return View(post);
+                return View(model);
             }
         }
 
@@ -158,19 +295,93 @@ namespace WebsiteBlogCMS.Controllers
         [HttpPost]
         [ValidateInput(false)]
         [Authorize]
-        public ActionResult Create(Post post, string selectedCategories, string selectedTags)
+        public ActionResult Create(PostModel model, string selectedCategories, string selectedTags, HttpPostedFileBase image)
         {
-            if (!ModelState.IsValid)
-            {
-                return View("HttpNotFound");
-            }
-
             using (var ctx = DbHelper.DataContext)
             {
+                string errorMessages = string.Empty;
+
+                var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                };
+
+                IEnumerable<DropDownItem> categories = ctx.Categories.ToList().Select(c =>
+                {
+                    bool isSelected = false;
+
+                    if(selectedCategories != null)
+                    {
+                        isSelected = selectedCategories.Split(',').ToList().Contains(c.id.ToString());
+                    }
+
+                    return new DropDownItem
+                    (
+                        c.title,
+                        c.id,
+                        isSelected
+                    );
+                });
+                ViewBag.Categories = Newtonsoft.Json.JsonConvert.SerializeObject(categories, jsonSettings);
+                if(string.IsNullOrEmpty(selectedCategories))
+                {
+                    errorMessages += "Kategoria jest wymagana. ";
+                }
+
+                IEnumerable<DropDownItem> tags = ctx.Tags.ToList().Select(t =>
+                {
+                    bool isSelected = false;
+
+                    if (selectedTags != null)
+                    {
+                        isSelected = selectedTags.Split(',').ToList().Contains(t.id.ToString());
+                    }
+
+                    return new DropDownItem
+                    (
+                        t.title,
+                        t.id,
+                        isSelected
+                    );
+                });
+                ViewBag.Tags = Newtonsoft.Json.JsonConvert.SerializeObject(tags, jsonSettings);
+
+                if (image != null && image.ContentLength > 0)
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        image.InputStream.CopyTo(ms);
+                        model.Image = ms.ToArray();
+                    }
+                }
+
+                if (!ModelState.IsValid || !string.IsNullOrEmpty(errorMessages))
+                {
+                    if (!string.IsNullOrEmpty(errorMessages))
+                    {
+                        TempData[Message(MessageType.Warning)] = errorMessages;
+                    }
+                    return View(model);
+                }
+
+                Post post = new Post();
+                post.title = model.Title;
+                post.content = model.Content;
+
                 if (!PostUtils.IsPostValid(ctx, post))
                 {
                     TempData[Message(MessageType.Warning)] = "Post o takim tytule już istnieje.";
-                    return RedirectToAction("Posts", "Admin");
+                    return View(model);
+                }
+
+                if (model.Image != null && model.Image.Length > 0)
+                {
+                    post.image = new Binary(model.Image);
+                }
+                else if (model.Image == null)
+                {
+                    TempData[Message(MessageType.Warning)] = "Zdjęcie postu jest wymagane.";
+                    return View(model);
                 }
 
                 using (var transaction = new System.Transactions.TransactionScope())
@@ -266,46 +477,118 @@ namespace WebsiteBlogCMS.Controllers
                 ));
                 ViewBag.Tags = Newtonsoft.Json.JsonConvert.SerializeObject(tags, jsonSettings);
 
-                var content = ctx.Posts.Where(p => p.id.Equals(id)).Select(p => p.content).SingleOrDefault();
-                ViewBag.Content = Newtonsoft.Json.JsonConvert.SerializeObject(content, jsonSettings);
+                PostModel model = new PostModel();
+                model.Id = id;
+                model.Published = data.published;
+                model.IsVisible = data.isVisible;
+                model.Title = data.title;
+                model.Content = data.content;
+                model.Image = data.image?.ToArray() ?? null;
 
-                return View(data);
+                return View(model);
             }
         }
 
         [HttpPost]
         [ValidateInput(false)]
         [Authorize]
-        public ActionResult Edit(Post post, string selectedCategories, string selectedTags)
+        public ActionResult Edit(PostModel model, string selectedCategories, string selectedTags, HttpPostedFileBase image)
         {
-            if (!ModelState.IsValid)
-            {
-                return View("HttpNotFound");
-            }
-
             using (var ctx = DbHelper.DataContext)
             {
-                if (!PostUtils.IsPostValid(ctx, post))
+                string errorMessages = string.Empty;
+
+                var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
                 {
-                    TempData[Message(MessageType.Warning)] = "Post o takim tytule już istnieje.";
+                    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                };
+
+                IEnumerable<DropDownItem> categories = ctx.Categories.ToList().Select(c =>
+                {
+                    bool isSelected = false;
+
+                    if (selectedCategories != null)
+                    {
+                        isSelected = selectedCategories.Split(',').ToList().Contains(c.id.ToString());
+                    }
+
+                    return new DropDownItem
+                    (
+                        c.title,
+                        c.id,
+                        isSelected
+                    );
+                });
+                ViewBag.Categories = Newtonsoft.Json.JsonConvert.SerializeObject(categories, jsonSettings);
+                if (string.IsNullOrEmpty(selectedCategories))
+                {
+                    errorMessages += "Kategoria jest wymagana. ";
+                }
+
+                IEnumerable<DropDownItem> tags = ctx.Tags.ToList().Select(t =>
+                {
+                    bool isSelected = false;
+
+                    if (selectedTags != null)
+                    {
+                        isSelected = selectedTags.Split(',').ToList().Contains(t.id.ToString());
+                    }
+
+                    return new DropDownItem
+                    (
+                        t.title,
+                        t.id,
+                        isSelected
+                    );
+                });
+                ViewBag.Tags = Newtonsoft.Json.JsonConvert.SerializeObject(tags, jsonSettings);
+
+                if (image != null && image.ContentLength > 0)
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        image.InputStream.CopyTo(ms);
+                        model.Image = ms.ToArray();
+                    }
+                }
+
+                if (!ModelState.IsValid || !string.IsNullOrEmpty(errorMessages))
+                {
+                    TempData[Message(MessageType.Warning)] = errorMessages;
+                    return View(model);
+                }
+
+                Post post = PostUtils.GetPost(ctx, model.Title);
+
+                if (post == null)
+                {
                     return View("HttpNotFound");
                 }
 
-                Post data = PostUtils.GetPost(ctx, post.id);
-
-                if (data == null)
+                if (!PostUtils.IsPostValid(ctx, post))
                 {
-                    return View("HttpNotFound");
+                    TempData[Message(MessageType.Warning)] = "Post o takim tytule już istnieje.";
+                    return View(model);
+                }
+
+                if (model.Image != null && model.Image.Length > 0)
+                {
+                    post.image = new Binary(model.Image);
+                }
+                else if (model.Image == null)
+                {
+                    TempData[Message(MessageType.Warning)] = "Zdjęcie postu jest wymagane.";
+                    return View(model);
                 }
 
                 using (var transaction = new System.Transactions.TransactionScope())
                 {
-                    data.title = post.title;
-                    data.content = post.content;
-                    data.isVisible = post.isVisible;
-                    data.updatedAt = DateTime.Now;
+                    post.title = model.Title;
+                    post.content = model.Content;
+                    post.isVisible = model.IsVisible;   
+                    post.updatedAt = DateTime.Now;
 
-                    var deleteCategories = ctx.PostCategories.Where(x => x.postId.Equals(data.id)).ToList();
+                    var deleteCategories = ctx.PostCategories.Where(x => x.postId.Equals(post.id)).ToList();
                     ctx.PostCategories.DeleteAllOnSubmit(deleteCategories);
                     ctx.SubmitChanges();
 
@@ -314,13 +597,13 @@ namespace WebsiteBlogCMS.Controllers
                         foreach (var id in selectedCategories.Split(',').Select(x => int.Parse(x)))
                         {
                             PostCategory postCategory = new PostCategory();
-                            postCategory.postId = data.id;
+                            postCategory.postId = post.id;
                             postCategory.categoryId = id;
                             ctx.PostCategories.InsertOnSubmit(postCategory);
                         }
                     }
 
-                    var deleteTags = ctx.PostTags.Where(x => x.postId.Equals(data.id)).ToList();
+                    var deleteTags = ctx.PostTags.Where(x => x.postId.Equals(post.id)).ToList();
                     ctx.PostTags.DeleteAllOnSubmit(deleteTags);
                     ctx.SubmitChanges();
 
@@ -329,7 +612,7 @@ namespace WebsiteBlogCMS.Controllers
                         foreach (var id in selectedTags.Split(',').Select(x => int.Parse(x)))
                         {
                             PostTag postTag = new PostTag();
-                            postTag.postId = data.id;
+                            postTag.postId = post.id;
                             postTag.tagId = id;
                             ctx.PostTags.InsertOnSubmit(postTag);
                         }

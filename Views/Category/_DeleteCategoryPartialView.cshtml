@@ -1,7 +1,7 @@
-﻿@model WebsiteBlogCMS.Data.Category
+﻿@model WebsiteBlogCMS.Models.Validation.CategoryModel
 
-<div class="modal fade" id="DeleteCategory-@Model.id" aria-labelledby="DeleteCategoryLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+<div class="modal fade" id="DeleteCategory-@Model.Id" aria-labelledby="DeleteCategoryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="DeleteCategoryLabel">Czy jesteś pewien, że chcesz usunąć kategorię?</h5>
@@ -11,30 +11,30 @@
             </div>
             <div class="modal-body">
                 <dl class="row">
-                    <dt class="col-sm-3">
+                    <dt class="col-sm-5">
                         Nazwa
                     </dt>
-                    <dd class="col-sm-9">
-                        @Html.DisplayFor(model => model.title)
+                    <dd class="col-sm-7">
+                        @Html.DisplayFor(model => model.Title)
                     </dd>
-                    <dt class="col-sm-3">
+                    <dt class="col-sm-5">
                         Kategoria nadrzędna
                     </dt>
-                    <dd class="col-sm-9">
-                        @if (Model.parentId == null)
+                    <dd class="col-sm-7">
+                        @if (Model.ParentId == null)
                         {
-                            @Html.Display("Brak");
+                            @:Brak
                         }
                         else
                         {
-                            @Html.DisplayFor(model => model.Category1.title)
+                            @WebsiteBlogCMS.Classes.DataHelper.CategoryUtils.GetCategory((int)Model.ParentId).title
                         }
                     </dd>
-                    <dt class="col-sm-3">
+                    <dt class="col-sm-5">
                         Opis
                     </dt>
-                    <dd class="col-sm-9">
-                        @Html.DisplayFor(model => model.content)
+                    <dd class="col-sm-7">
+                        @Html.DisplayFor(model => model.Content)
                     </dd>
                 </dl>
                 @using (Html.BeginForm("Delete", "Category", FormMethod.Post))
@@ -42,7 +42,7 @@
                     @Html.AntiForgeryToken()
 
                     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                    @Html.HiddenFor(model => model.id)
+                    @Html.HiddenFor(model => model.Id)
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>

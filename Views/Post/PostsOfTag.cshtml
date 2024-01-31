@@ -1,4 +1,4 @@
-﻿@model WebsiteBlogCMS.Models.PostsOfCategoryModel
+﻿@model WebsiteBlogCMS.Models.PostsOfTagModel
 @using PagedList.Mvc
 
 @{
@@ -8,38 +8,8 @@
 <div class="w3l-homeblock2 w3l-homeblock5 py-5">
     <div class="container pt-md-4 pb-md-5">
         <!-- block -->
-        @if (Model.ParentCategory != null)
-        {
-            <p class="mb-3">
-                @Html.ActionLink($"Przejdź do kategorii nadrzędnej: {Model.ParentCategory.title}", "PostsOfCategory", "Post", new { id = Model.ParentCategory.id }, null)
-            </p>
-        }
-        <h3 class="category-title mb-3">@Model.Category.title</h3>
-        <p class="mb-sm-5 mb-4 max-width">@Model.Category.content</p>
-        <!-- /homeblock1-->
-        @if (Model.SubCategories.Any())
-        {
-            <hr class="border-hr" />
-            <section class="w3l-homeblock1">
-                <div class="container">
-                    <div class="grids-area-hny main-cont-wthree-fea row justify-content-center">
-                        @foreach (var item in Model.SubCategories)
-                        {
-                            <div class="col-lg-3 col-6 grids-feature">
-                                <a href="@Url.Action("PostsOfCategory", "Post", new { id = item.id })">
-                                    <div class="area-box">
-                                        <h4 class="title-head">@item.title</h4>
-                                    </div>
-                                </a>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </section>
-            <hr />
-        }
-        <!-- //homeblock1-->
-
+        <h3 class="category-title mb-3">@Model.Tag.title</h3>
+        
         <div class="row">
             @if (Model.Posts.Any())
             {
@@ -80,7 +50,7 @@
             }
             else
             {
-                <p class="mb-sm-5 mb-4 max-width">Brak postów dla danej kategorii</p>
+                <p class="mb-sm-5 mb-4 max-width">Brak postów dla danego tagu</p>
             }
         </div>
 
@@ -90,7 +60,7 @@
                     if (Model.Posts.HasPreviousPage)
                     {
                         <li class="page-item">
-                            <a class="page-link" href="@Url.Action("PostsOfCategory", new { page = Model.Posts.PageNumber - 1, id = Model.Category.id })" aria-label="Previous">
+                            <a class="page-link" href="@Url.Action("PostsOfTag", new { page = Model.Posts.PageNumber - 1, id = Model.Tag.id })" aria-label="Previous">
                                 <span aria-hidden="true" style="user-select: none;">&laquo;</span>
                             </a>
                         </li>
@@ -113,7 +83,7 @@
                         else
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("PostsOfCategory", new { page = i, id = Model.Category.id })" style="user-select: none;">@i</a>
+                                <a class="page-link" href="@Url.Action("PostsOfTag", new { page = i, id = Model.Tag.id })" style="user-select: none;">@i</a>
                             </li>
                         }
                     }
@@ -121,7 +91,7 @@
                     if (Model.Posts.HasNextPage)
                     {
                         <li class="page-item">
-                            <a class="page-link" href="@Url.Action("PostsOfCategory", new { page = Model.Posts.PageNumber + 1, id = Model.Category.id })" aria-label="Next">
+                            <a class="page-link" href="@Url.Action("PostsOfTag", new { page = Model.Posts.PageNumber + 1, id = Model.Tag.id })" aria-label="Next">
                                 <span aria-hidden="true" style="user-select: none;">&raquo;</span>
                             </a>
                         </li>

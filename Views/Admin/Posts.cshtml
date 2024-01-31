@@ -29,10 +29,10 @@
                             Data utworzenia
                         </th>
                         <th>
-                            Status
+                            Data publikacji
                         </th>
                         <th>
-                            Data publikacji
+                            Status
                         </th>
                         <th></th>
                     </tr>
@@ -50,10 +50,10 @@
                             Data utworzenia
                         </th>
                         <th>
-                            Status
+                            Data publikacji
                         </th>
                         <th>
-                            Data publikacji
+                            Status
                         </th>
                         <th></th>
                     </tr>
@@ -63,13 +63,17 @@
                     {
                         <tr>
                             <td>
-                                @Html.DisplayFor(modelItem => item.User.login)
+                                @Html.DisplayFor(modelItem => item.User.firstName) @Html.DisplayFor(modelItem => item.User.lastName)
+                                (@Html.DisplayFor(model => item.User.login))
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.title)
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.createdAt)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.publishedAt)
                             </td>
                             <td class="text-center align-middle">
                                 @if (!item.published)
@@ -84,9 +88,6 @@
                                 {
                                     <i class="bi bi-x-circle text-danger" style="font-size: 1.5em;"></i> <!-- X icon -->
                                 }
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.publishedAt)
                             </td>
                             <td>
                                 @if (!item.published)

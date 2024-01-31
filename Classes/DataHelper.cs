@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Linq;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.Remoting.Contexts;
+using System.Web.Mvc;
 using System.Web.UI.WebControls;
 using WebsiteBlogCMS.Data;
 
@@ -102,11 +105,60 @@ namespace WebsiteBlogCMS.Classes
             }
         }
 
+        public static class CommentUtils
+        {
+            public static Comment GetComment(BlogDBDataContext ctx, int id)
+            {
+                return ctx.Comments.Where(x => x.id.Equals(id)).SingleOrDefault();
+            }
+
+            public static Comment GetComment(int id)
+            {
+                using(var ctx = DbHelper.DataContext)
+                {
+                    return GetComment(ctx, id);
+                }
+            }
+
+            public static List<Comment> GetPostComments(BlogDBDataContext ctx, Post post, bool onlyVisible = true)
+            {
+                return ctx.Comments.Where(x => x.postId == post.id && (!onlyVisible || x.isVisible)).ToList();
+            }
+
+            public static List<Comment> GetRootComments(BlogDBDataContext ctx, Post post, bool onlyVisible = true)
+            {
+                return ctx.Comments.Where(x => x.postId == post.id && x.parentId == null && (!onlyVisible || x.isVisible)).ToList();
+            }
+
+            public static List<Comment> GetNestedComments(Comment root, bool onlyVisible = true)
+            {
+                List<Comment> result = new List<Comment>();
+                using(var ctx = DbHelper.DataContext)
+                {
+                    var children = ctx.Comments.Where(x => x.parentId == root.id && (!onlyVisible || x.isVisible)).ToList();
+                    result.AddRange(children);
+                    foreach(var child in children)
+                    {
+                        result.AddRange(GetNestedComments(child, onlyVisible));
+                    }
+                }
+                return result;
+            }
+        }
+
         public static class RoleUtils
         {
             public static List<Role> GetRoles(BlogDBDataContext ctx)
             {
                 return ctx.Roles.ToList();
+            }
+
+            public static List<Role> GetRoles()
+            {
+                using(var ctx = DbHelper.DataContext)
+                {
+                    return GetRoles(ctx);
+                }
             }
 
             public static Role GetRole(BlogDBDataContext ctx, int id)
@@ -133,9 +185,30 @@ namespace WebsiteBlogCMS.Classes
                 return ctx.Users.Where(x => x.login.Equals(login)).Single();
             }
 
+            public static User GetUser(string login)
+            {
+                using(var ctx = DbHelper.DataContext)
+                {
+                    return GetUser(ctx, login);
+                }
+            }
+
             public static User GetUser(BlogDBDataContext ctx, int id)
             {
                 return ctx.Users.Where(x => x.id.Equals(id)).Single();
+            }
+
+            public static Role GetUserRole(int id)
+            {
+                using(var ctx = DbHelper.DataContext)
+                {
+                    DataLoadOptions options = new DataLoadOptions();
+                    options.LoadWith<User>(x => x.Role);
+                    ctx.LoadOptions = options;
+
+                    User user = GetUser(ctx, id);
+                    return user.Role;
+                }
             }
 
             public static List<User> GetUsers(BlogDBDataContext ctx)
@@ -153,7 +226,7 @@ namespace WebsiteBlogCMS.Classes
                 using(var ctx = DbHelper.DataContext)
                 {
                     User user = GetUser(ctx, login);
-                    return level >= user.roleId;
+                    return level >= user.roleId && IsUserConfigured(user);
                 } 
             }
 
@@ -161,6 +234,14 @@ namespace WebsiteBlogCMS.Classes
             {
                 User user = GetUser(ctx, id);
                 return $"{user.firstName} {user.lastName}";
+            }
+
+            public static string GetUserName(int id)
+            {
+                using(var ctx = DbHelper.DataContext)
+                {
+                    return GetUserName(ctx, id);
+                }
             }
 
             public static int GetAdminsCount(BlogDBDataContext ctx)
@@ -201,6 +282,11 @@ namespace WebsiteBlogCMS.Classes
                 return ctx.Tags.ToList();
             }
 
+            public static List<Tag> GetAssociatedTags(BlogDBDataContext ctx, bool onlyVisible = true)
+            {
+                return ctx.Tags.Where(x => x.PostTags.Any(y => !onlyVisible || y.Post.isVisible)).ToList();
+            }
+
             public static bool IsTagValid(BlogDBDataContext ctx, Tag tag)
             {
                 return !ctx.Tags.Any(x =>
@@ -217,14 +303,35 @@ namespace WebsiteBlogCMS.Classes
                 return ctx.Categories.Where(x => x.id.Equals(id)).SingleOrDefault();
             }
 
+            public static Category GetCategory(int id)
+            {
+                using (var ctx = DbHelper.DataContext)
+                {
+                    return GetCategory(ctx, id);
+                }
+            }
+
             public static List<Category> GetCategories(BlogDBDataContext ctx)
             {
                 return ctx.Categories.ToList();
             }
 
+            public static List<Category> GetAssociatedCategories(BlogDBDataContext ctx, bool onlyVisible = true)
+            {
+                return ctx.Categories.Where(x => x.PostCategories.Any(y => !onlyVisible || y.Post.isVisible)).ToList();
+            }
+
             public static List<Category> GetRootCategories(BlogDBDataContext ctx)
             {
                 return ctx.Categories.Where(x => x.parentId == null).ToList();
+            }
+
+            public static List<Category> GetRootCategories()
+            {
+                using(var ctx = DbHelper.DataContext)
+                {
+                    return GetRootCategories(ctx);
+                }
             }
 
             public static bool IsCategoryValid(BlogDBDataContext ctx, Category category)
@@ -233,6 +340,42 @@ namespace WebsiteBlogCMS.Classes
                     x.title.Equals(category.title) &&
                     (category.id == null || !x.id.Equals(category.id))
                 );
+            }
+
+            public static List<Category> GetSubCats(BlogDBDataContext ctx, Category category, bool onlyVisible = true)
+            {
+                return ctx.Categories.Where(x => x.parentId.Equals(category.id) && x.PostCategories.Any(y => !onlyVisible || y.Post.isVisible)).ToList();
+            }
+
+            public static List<Category> GetSubCats(Category category, bool onlyVisible = true)
+            {
+                using(var ctx = DbHelper.DataContext)
+                {
+                    return GetSubCats(ctx, category, onlyVisible);
+                }
+            }
+
+            private static bool IsChildRecursive(List<Category> categories, int id, int? parentId)
+            {
+                if (!parentId.HasValue)
+                    return false;
+
+                if (parentId == id)
+                    return true;
+
+                // Apply recursive logic in memory
+                return categories
+                    .Where(c => c.id == parentId)
+                    .Any(c => IsChildRecursive(categories, id, c.parentId));
+            }
+
+            public static bool WillCreateLoop(int id, int? parentId)
+            {
+                using (var ctx = DbHelper.DataContext)
+                {
+                    var categories = ctx.Categories.ToList();
+                    return IsChildRecursive(categories, id, parentId);
+                }
             }
         }
 
@@ -254,6 +397,22 @@ namespace WebsiteBlogCMS.Classes
                     x.title.Equals(slider.title) &&
                     (slider.id == null || !x.id.Equals(slider.id))
                 );
+            }
+        }
+
+        public static class ModelUtils
+        {
+            public static string GetErrorMessages(ModelStateDictionary modelState)
+            {
+                string errorMessage = string.Empty;
+                foreach (var key in modelState.Keys)
+                {
+                    foreach (var error in modelState[key].Errors)
+                    {
+                        errorMessage += $"{error.ErrorMessage} ";
+                    }
+                }
+                return errorMessage;
             }
         }
     }

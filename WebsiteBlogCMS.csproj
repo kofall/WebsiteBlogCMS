@@ -57,6 +57,12 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
+    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data.Linq">
       <Private>True</Private>
     </Reference>
@@ -113,7 +119,9 @@
     <Content Include="Content\bootstrap-chosen.css" />
     <Content Include="Content\chosen-sprite%402x.png" />
     <Content Include="Content\chosen-sprite.png" />
+    <Content Include="Content\PagedList.css" />
     <Content Include="css\style-adminpanel.css" />
+    <Content Include="css\style-custom.css" />
     <Content Include="css\style-liberty.css" />
     <Content Include="css\virtual-select.min.css" />
     <Content Include="fonts\fontawesome-webfont.svg" />
@@ -183,6 +191,7 @@
     <Compile Include="Classes\DbHelper.cs" />
     <Compile Include="Classes\DataHelper.cs" />
     <Compile Include="Classes\Enums.cs" />
+    <Compile Include="Classes\HtmlHelper.cs" />
     <Compile Include="Classes\TokenService.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
@@ -192,6 +201,9 @@
     <Compile Include="Controllers\SliderController.cs" />
     <Compile Include="Controllers\TagController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Data\BlogDB.cs">
+      <DependentUpon>BlogDB.dbml</DependentUpon>
+    </Compile>
     <Compile Include="Data\BlogDB.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -204,7 +216,17 @@
     <Compile Include="Models\HomeContent.cs" />
     <Compile Include="Models\AdminStatistics.cs" />
     <Compile Include="Models\PickOrderItemViewModel.cs" />
+    <Compile Include="Models\PostDetailsModel.cs" />
+    <Compile Include="Models\PostsOfCategoryModel.cs" />
+    <Compile Include="Models\PostsOfTagModel.cs" />
     <Compile Include="Models\UserAccount.cs" />
+    <Compile Include="Models\UserDetailsModel.cs" />
+    <Compile Include="Models\Validation\CategoryModel.cs" />
+    <Compile Include="Models\Validation\CommentModel.cs" />
+    <Compile Include="Models\Validation\EditSettingsModel.cs" />
+    <Compile Include="Models\Validation\PostModel.cs" />
+    <Compile Include="Models\Validation\SlideModel.cs" />
+    <Compile Include="Models\Validation\TagModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -218,14 +240,13 @@
     <Content Include="Views\_BlogLayoutPage.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Category\Index.cshtml" />
-    <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Tag\Index.cshtml" />
     <Content Include="Views\Post\PostsOfCategory.cshtml" />
     <Content Include="Views\Category\Details.cshtml" />
     <Content Include="Views\Post\Details.cshtml" />
     <Content Include="Views\Tag\Details.cshtml" />
     <Content Include="Views\User\Details.cshtml" />
-    <Content Include="Views\_AdminPanelLayoutPage.cshtml" />
+    <Content Include="Views\_AdminPanelLayoutPage-WithLiberty.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Admin\Login.cshtml" />
     <Content Include="Views\Admin\Users.cshtml" />
@@ -252,8 +273,6 @@
     <Content Include="Views\Tag\_DetailTagPartialView.cshtml" />
     <Content Include="Views\Tag\_EditTagPartialView.cshtml" />
     <Content Include="Views\Post\_DeletePostPartialView.cshtml" />
-    <Content Include="Views\Post\_DetailPostPartialView.cshtml" />
-    <Content Include="Views\Post\_EditPostPartialView.cshtml" />
     <Content Include="Views\Admin\Settings.cshtml" />
     <Content Include="Views\Post\Create.cshtml" />
     <Content Include="Views\Post\Edit.cshtml" />
@@ -266,6 +285,10 @@
     <Content Include="Views\Admin\PickPage.cshtml" />
     <Content Include="Views\Shared\_Message.cshtml" />
     <Content Include="Views\Post\Preview.cshtml" />
+    <Content Include="Views\Post\PostsOfTag.cshtml" />
+    <Content Include="Views\Home\Categories.cshtml" />
+    <Content Include="Views\Home\Tags.cshtml" />
+    <Content Include="Views\_AdminPanelLayoutPage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

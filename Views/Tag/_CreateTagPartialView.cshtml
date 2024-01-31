@@ -1,7 +1,7 @@
-﻿@model WebsiteBlogCMS.Data.Tag
+﻿@model WebsiteBlogCMS.Models.Validation.TagModel
 
-<div class="modal fade" id="CreateTag-@Model.id" aria-labelledby="CreateTagLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+<div class="modal fade" id="CreateTag-@Model.Id" aria-labelledby="CreateTagLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="CreateTagLabel">Stwórz tag</h5>
@@ -15,9 +15,9 @@
                     @Html.AntiForgeryToken()
 
                     <div class="form-floating mb-3">
-                        @Html.EditorFor(model => model.title, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                        @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
                         <label for="login">Nazwa</label>
-                        @Html.ValidationMessageFor(model => model.title, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="modal-footer">

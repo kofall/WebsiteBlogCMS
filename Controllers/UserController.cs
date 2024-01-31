@@ -1,8 +1,16 @@
-﻿using System;
+﻿using PagedList;
+using System;
+using System.Collections.Generic;
+using System.Data.Linq;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
+using System.Web.Services.Description;
 using WebsiteBlogCMS.Classes;
 using WebsiteBlogCMS.Data;
+using WebsiteBlogCMS.Models;
+using WebsiteBlogCMS.Models.Validation;
 using static WebsiteBlogCMS.Classes.DataHelper;
 using static WebsiteBlogCMS.Classes.Enums;
 
@@ -10,6 +18,29 @@ namespace WebsiteBlogCMS.Controllers
 {
     public class UserController : Controller
     {
+        public ActionResult Details(int id, int? page)
+        {
+            int pageSize = 6;
+            int pageNumber = (page ?? 1);
+
+            using (var ctx = DbHelper.DataContext)
+            {
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<User>(x => x.Posts);
+                options.LoadWith<User>(x => x.Role);
+                ctx.LoadOptions = options;
+
+                User user = UserUtils.GetUser(ctx, id);
+                List<Post> posts = PostUtils.GetUserPosts(ctx, id);
+
+                UserDetailsModel model = new UserDetailsModel();
+                model.User = user;
+                model.UserPosts = posts.ToPagedList(pageNumber, pageSize);
+
+                return View(model);
+            }
+        }
+
         // GET: User
         [Authorize]
         public ActionResult Index()
@@ -23,7 +54,8 @@ namespace WebsiteBlogCMS.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("HttpNotFound");
+                TempData[Message(MessageType.Warning)] = "Aby dodać konto, najpierw nadaj mu rolę.";
+                return RedirectToAction("Users", "Admin");
             }
 
             using (var ctx = DbHelper.DataContext)
@@ -59,12 +91,17 @@ namespace WebsiteBlogCMS.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("HttpNotFound");
+                TempData[Message(MessageType.Warning)] = "Aby edytować rolę konta, najpierw wybierz rolę.";
+                return RedirectToAction("Users", "Admin");
             }
 
             using (var ctx = DbHelper.DataContext)
             {
-                var userData = UserUtils.GetUser(ctx, user.id);
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<User>(x => x.Role);
+                ctx.LoadOptions = options;
+
+                User userData = UserUtils.GetUser(ctx, user.id);
 
                 if (user == null)
                 {
@@ -87,31 +124,53 @@ namespace WebsiteBlogCMS.Controllers
 
         [HttpPost]
         [Authorize]
-        public ActionResult EditSettings(User user)
+        [ValidateAntiForgeryToken]
+        public ActionResult EditSettings(EditSettingsModel model, HttpPostedFileBase profileImage)
         {
             if (!ModelState.IsValid)
             {
-                return View("HttpNotFound");
+                ViewBag.Roles = RoleUtils.GetRoles();
+                return View("~/Views/Admin/Settings.cshtml", model);
+            }
+
+            if (profileImage != null && profileImage.ContentLength > 0)
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    profileImage.InputStream.CopyTo(ms);
+                    model.ProfileImage = ms.ToArray();
+                }
             }
 
             using (var ctx = DbHelper.DataContext)
             {
-                var userData = UserUtils.GetUser(ctx, user.id);
+                User user = UserUtils.GetUser(ctx, model.Id);
 
                 if (user == null)
                 {
                     return View("HttpNotFound");
                 }
 
-                userData.firstName = user.firstName;
-                userData.lastName = user.lastName;
-                userData.intro = user.intro;
-                userData.profile = user.profile;
+                if (model.ProfileImage != null && model.ProfileImage.Length > 0)
+                {
+                    user.profileImage = new Binary(model.ProfileImage);
+                }
+                else if(model.ProfileImage == null)
+                {
+                    TempData[Message(MessageType.Warning)] = "Zdjęcie profilowe jest wymagane.";
+                    ViewBag.Roles = RoleUtils.GetRoles();
+                    return View("~/Views/Admin/Settings.cshtml", model);
+                }
+
+                user.firstName = model.FirstName;
+                user.lastName = model.LastName;
+                user.intro = model.Intro;
+                user.profile = model.Profile;
 
                 ctx.SubmitChanges();
 
                 TempData[Message(MessageType.Success)] = "Pomyślnie zapisano zmiany.";
-                return RedirectToAction("Settings", "Admin", new { id = user.id });
+                return RedirectToAction("Settings", "Admin", new { login = User.Identity.Name });
             }
         }
 
@@ -121,6 +180,10 @@ namespace WebsiteBlogCMS.Controllers
         {
             using (var ctx = DbHelper.DataContext)
             {
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<User>(x => x.Role);
+                ctx.LoadOptions = options;
+
                 User user = UserUtils.GetUser(ctx, id);
 
                 if (user == null)
@@ -158,6 +221,10 @@ namespace WebsiteBlogCMS.Controllers
         {
             using (var ctx = DbHelper.DataContext)
             {
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<User>(x => x.Role);
+                ctx.LoadOptions = options;
+
                 User user = new User();
 
                 if (operation != "Create")

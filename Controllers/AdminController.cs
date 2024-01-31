@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Linq;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -7,6 +8,7 @@ using System.Web.UI.WebControls;
 using WebsiteBlogCMS.Classes;
 using WebsiteBlogCMS.Data;
 using WebsiteBlogCMS.Models;
+using WebsiteBlogCMS.Models.Validation;
 using static WebsiteBlogCMS.Classes.DataHelper;
 using static WebsiteBlogCMS.Classes.Enums;
 
@@ -35,7 +37,6 @@ namespace WebsiteBlogCMS.Controllers
 
         public ActionResult Login()
         {
-            TempData[Message(MessageType.Success)] = CryptHelper.Decrypt("MyI0cFwdCnsX9T7tv+G7Vf7Bn+6cVH7j");
             if (User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index");
@@ -154,9 +155,19 @@ namespace WebsiteBlogCMS.Controllers
 
             using (var ctx = DbHelper.DataContext)
             {
-                User user = UserUtils.GetUser(ctx,User.Identity.Name);
+                User user = UserUtils.GetUser(ctx, User.Identity.Name);
+                EditSettingsModel model = new EditSettingsModel();
+                model.Id = user.id;
+                model.RoleId = user.roleId;
+                model.FirstName = user.firstName;
+                model.LastName = user.lastName;
+                model.Login = user.login;
+                model.Intro = user.intro;
+                model.Profile = user.profile;
+                model.ProfileImage = user.profileImage?.ToArray() ?? null;
+
                 ViewBag.Roles = RoleUtils.GetRoles(ctx);
-                return View(user);
+                return View(model);
             }
         }
 
@@ -171,6 +182,10 @@ namespace WebsiteBlogCMS.Controllers
 
             using (var ctx = DbHelper.DataContext)
             {
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<User>(x => x.Role);
+                ctx.LoadOptions = options;
+
                 List<User> users = UserUtils.GetUsers(ctx);
                 return View(users);
             }
@@ -231,7 +246,7 @@ namespace WebsiteBlogCMS.Controllers
 
             using (var ctx = DbHelper.DataContext)
             {
-                var data = ctx.Categories.ToList();
+                var data = CategoryUtils.GetAssociatedCategories(ctx);
                 var dataPicks = ctx.CategorySettings.ToList();
 
                 var viewModel = data.Select(x => new PickOrderItemViewModel
@@ -259,7 +274,7 @@ namespace WebsiteBlogCMS.Controllers
 
             using (var ctx = DbHelper.DataContext)
             {
-                var data = ctx.Posts.ToList();
+                var data = ctx.Posts.Where(x => x.isVisible).ToList();
                 var dataPicks = ctx.EditorsPicks.ToList();
 
                 var viewModel = data.Select(x => new PickOrderItemViewModel
@@ -288,7 +303,7 @@ namespace WebsiteBlogCMS.Controllers
 
             using (var ctx = DbHelper.DataContext)
             {
-                var data = ctx.Posts.ToList();
+                var data = ctx.Posts.Where(x => x.isVisible).ToList();
                 var dataPicks = ctx.TopMonthPicks.ToList();
 
                 var viewModel = data.Select(x => new PickOrderItemViewModel
@@ -317,7 +332,7 @@ namespace WebsiteBlogCMS.Controllers
 
             using (var ctx = DbHelper.DataContext)
             {
-                var data = ctx.Posts.ToList();
+                var data = ctx.Posts.Where(x => x.isVisible).ToList();
                 var dataPicks = ctx.TopPicks.ToList();
 
                 var viewModel = data.Select(x => new PickOrderItemViewModel
@@ -378,6 +393,10 @@ namespace WebsiteBlogCMS.Controllers
 
             using (var ctx = DbHelper.DataContext)
             {
+                DataLoadOptions options = new DataLoadOptions();
+                options.LoadWith<Post>(x => x.User);
+                ctx.LoadOptions = options;
+
                 User user = UserUtils.GetUser(ctx, User.Identity.Name);
 
                 List<Post> posts = new List<Post>();

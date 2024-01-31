@@ -1,6 +1,6 @@
-﻿@model WebsiteBlogCMS.Data.Category
+﻿@model WebsiteBlogCMS.Models.Validation.CategoryModel
 
-<div class="modal fade" id="CreateCategory-@Model.id" aria-labelledby="CreateCategoryLabel" aria-hidden="true">
+<div class="modal fade" id="CreateCategory-@Model.Id" aria-labelledby="CreateCategoryLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -15,22 +15,22 @@
                     @Html.AntiForgeryToken()
 
                     <div class="form-floating mb-3">
-                        @Html.EditorFor(model => model.title, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                        @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
                         <label for="login">Nazwa</label>
-                        @Html.ValidationMessageFor(model => model.title, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-floating mb-3">
-                        @Html.DropDownListFor(model => model.parentId, new SelectList(ViewBag.Categories, "id", "title"), "Brak", new { @class = "form-control" })
+                        @Html.DropDownListFor(model => model.ParentId, new SelectList(ViewBag.Categories, "id", "title"), "Brak", new { @class = "form-control" })
                         <label asp-for="parentId">Kategoria nadrzędna (opcjonalne)</label>
-                        @Html.ValidationMessageFor(model => model.parentId, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(model => model.ParentId, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-floating mb-3">
                         <div class="input-group">
-                            @Html.TextAreaFor(model => model.content, new { @class = "form-control", @placeholder = "Opis", @rows = "4" })
+                            @Html.TextAreaFor(model => model.Content, new { @class = "form-control", @placeholder = "Opis", @rows = "4" })
                         </div>
-                        @Html.ValidationMessageFor(model => model.content, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(model => model.Content, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="modal-footer">

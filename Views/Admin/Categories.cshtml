@@ -49,7 +49,10 @@
                                 @Html.DisplayFor(modelItem => item.title)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Category1.title)
+                                @if (item.parentId != null)
+                                {
+                                    @WebsiteBlogCMS.Classes.DataHelper.CategoryUtils.GetCategory((int)item.parentId).title
+                                }
                             </td>
                             <td>
                                 <button type="button" class="btn btn-warning" data-toggle="modal" onclick="loadPartialView('Edit', @item.id)">

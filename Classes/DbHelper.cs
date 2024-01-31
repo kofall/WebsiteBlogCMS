@@ -27,34 +27,6 @@ namespace WebsiteBlogCMS.Classes
         private static readonly string ServerUserId = "admin";
         private static readonly string ServerPassword = "admin";
 
-        private static void LoadOptions(BlogDBDataContext context)
-        {
-            DataLoadOptions options = new DataLoadOptions();
-            options.LoadWith<Post>(x => x.User);
-            options.LoadWith<Post>(x => x.Comments);
-            options.LoadWith<PostCategory>(x => x.Category);
-            options.LoadWith<PostCategory>(x => x.Post);
-            options.LoadWith<PostTag>(x => x.Tag);
-            options.LoadWith<PostTag>(x => x.Post);
-            options.LoadWith<User>(x => x.Role);
-            options.LoadWith<User>(x => x.Comments);
-            options.LoadWith<User>(x => x.UserTokens);
-            options.LoadWith<TopPick>(x => x.Post);
-            options.LoadWith<SliderPick>(x => x.Slider);
-            options.LoadWith<TopMonthPick>(x => x.Post);
-            options.LoadWith<EditorsPick>(x => x.Post);
-            options.LoadWith<CategorySetting>(x => x.Category);
-            context.LoadOptions = options;
-        }
-
-        public static BlogDBDataContext DataContext
-        {
-            get
-            {
-                BlogDBDataContext context = new BlogDBDataContext(ConnectionBlog);
-                LoadOptions(context);
-                return context;
-            }
-        }
+        public static BlogDBDataContext DataContext => new BlogDBDataContext(ConnectionBlog);
     }
 }

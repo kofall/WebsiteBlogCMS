@@ -1,12 +1,12 @@
-﻿@model WebsiteBlogCMS.Data.Post
+﻿@model WebsiteBlogCMS.Models.PostDetailsModel
 
 <link href="~/css/virtual-select.min.css" rel="stylesheet" />
 <script src="~/js/virtual-select.min.js"></script>
 
 @{
-    Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
+    Layout = "~/Views/_AdminPanelLayoutPage-WithLiberty.cshtml";
+    var user = WebsiteBlogCMS.Classes.DataHelper.UserUtils.GetUser(User.Identity.Name);
 }
-
 
 <div class="container-fluid px-4">
     <h1 class="mt-4">Szczegóły postu</h1>
@@ -15,23 +15,41 @@
             Tytuł
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.title)
+            @Html.DisplayFor(model => model.Post.title)
+        </dd>
+
+        <dt class="col-sm-2">
+            Autor
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Post.User.firstName) @Html.DisplayFor(model => model.Post.User.lastName)
+            (@Html.DisplayFor(model => model.Post.User.login))
         </dd>
 
         <dt class="col-sm-2">
             Utworzono
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.createdAt)
+            @Html.DisplayFor(model => model.Post.createdAt)
         </dd>
 
-        @if (Model.published)
+        @if (Model.Post.updatedAt != null)
+        {
+            <dt class="col-sm-2">
+                Ostatnia modyfikacja
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Post.updatedAt)
+            </dd>
+        }
+
+        @if (Model.Post.published)
         {
             <dt class="col-sm-2">
                 Opublikowano dnia
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.publishedAt)
+                @Html.DisplayFor(model => model.Post.publishedAt)
             </dd>
         }
         else
@@ -48,37 +66,13 @@
             Widoczny
         </dt>
         <dd class="col-sm-10">
-            @if (!Model.published)
+            @if (!Model.Post.published)
             {
                 @:Nie
             }
             else
             {
                 @:Tak
-            }
-        </dd>
-
-        @if (Model.updatedAt != null)
-        {
-            <dt class="col-sm-2">
-                Ostatnia modyfikacja
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.updatedAt)
-            </dd>
-        }
-
-        <dt class="col-sm-2">
-            Zatwierdzono dnia
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.published)
-            {
-                @Html.DisplayFor(model => model.publishedAt)
-            }
-            else
-            {
-                @:Nie zatwierdzono
             }
         </dd>
 
@@ -102,11 +96,202 @@
             }
         </dd>
 
+        @if (Model.Post.image != null && Model.Post.image.Length > 0)
+        {
+            <dt class="col-sm-2">
+                Zdjęcie
+            </dt>
+            <dd class="col-sm-10">
+                <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(Model.Post.image.ToArray()))" alt="Image" class="image-preview" />
+            </dd>
+        }
+
         <dt class="col-sm-2">
             Treść
         </dt>
         <dd class="col-sm-10">
-            @Html.Raw(Model.content)
+            @Html.Raw(Model.Post.content)
+        </dd>
+        <dd class="col-sm-12">
+            <section class="text-11">
+                <div class="text11">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="text11-content mb-5">
+                                    <div class="comments">
+                                        <h3 class="aside-title ">Komentarze (@Model.CommentsCount)</h3>
+                                        <div class="comments-grids">
+                                            @foreach (var comment in Model.Comments.Where(x => x.parentId == null))
+                                            {
+                                                <div class="media-grid">
+                                                    <div class="media">
+                                                        <div class="media-body comments-grid-right">
+                                                            <h5>
+                                                                @comment.authorName
+                                                                @if (comment.authorId != null)
+                                                                {
+                                                                    var authorRole = WebsiteBlogCMS.Classes.DataHelper.UserUtils.GetUserRole((int)comment.authorId);
+                                                                    <span style="color: red; font-size: 0.5em;"> @authorRole.name</span>
+                                                                }
+                                                            </h5>
+                                                            <ul class="p-0 comment">
+                                                                <li class="">@comment.publishedAt</li>
+                                                                <li>
+                                                                    <a href="#replyForm-@comment.id" class="text-primary reply-link-root" data-author="@comment.authorName" data-parentid="@comment.id">Odpowiedz</a>
+                                                                </li>
+                                                            </ul>
+                                                            <p>
+                                                                @comment.content
+                                                            </p>
+
+                                                            @foreach (var subComment in WebsiteBlogCMS.Classes.DataHelper.CommentUtils.GetNestedComments(comment))
+                                                            {
+                                                                var parent = WebsiteBlogCMS.Classes.DataHelper.CommentUtils.GetComment((int)subComment.parentId);
+
+                                                                <div class="media mt-4 mb-0 border-0 px-0 pb-0">
+                                                                    <div class="media-body comments-grid-right">
+                                                                        <h5>
+                                                                            @subComment.authorName
+                                                                            @if (subComment.authorId != null)
+                                                                            {
+                                                                                var authorRole = WebsiteBlogCMS.Classes.DataHelper.UserUtils.GetUserRole((int)subComment.authorId);
+                                                                                <span style="color: red; font-size: 0.5em;"> @authorRole.name</span>
+                                                                            }
+                                                                        </h5>
+                                                                        <ul class="p-0 comment">
+                                                                            <li class="">@subComment.publishedAt</li>
+                                                                            <li>
+                                                                                <a href="#replyForm-@subComment.id" class="text-primary reply-link-sub" data-author="@subComment.authorName" data-parentid="@subComment.id">Odpowiedz</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                        <p>
+                                                                            <span style="color: #5A67D8;">@parent.authorName</span> @subComment.content
+                                                                        </p>
+
+                                                                        <div class="leave-comment-form comment-form-to-hide" data-parent-id="@subComment.id" id="replyForm-@subComment.id" style="display: none;">
+                                                                            <div>
+                                                                                @using (Html.BeginForm("LeavePriorityComment", "Post", FormMethod.Post))
+                                                                                {
+                                                                                    @Html.AntiForgeryToken()
+                                                                                    @Html.HiddenFor(m => m.CommentModel.ParentId)
+                                                                                    @Html.HiddenFor(m => m.Post.id)
+
+                                                                                    <div class="input-grids">
+                                                                                        <div class="form-group">
+                                                                                            @Html.TextBoxFor(m => m.CommentModel.AuthorName, new { @class = "form-control", @readonly = "readonly", @Value = user.firstName + " " + user.lastName })
+                                                                                            @Html.ValidationMessageFor(m => m.CommentModel.AuthorName, "", new { @class = "text-danger" })
+                                                                                        </div>
+                                                                                        <div class="form-group">
+                                                                                            @Html.TextAreaFor(m => m.CommentModel.Content, new { @class = "form-control", placeholder = "Twój komentarz", required = "required", id = "CommentModel_Content" })
+                                                                                            @Html.ValidationMessageFor(m => m.CommentModel.Content, "", new { @class = "text-danger" })
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="submit text-right">
+                                                                                        <button type="submit" class="btn btn-style btn-primary">Odpowiedz</button>
+                                                                                    </div>
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+
+                                                            <div class="leave-comment-form comment-form-to-hide" data-parent-id="@comment.id" id="replyForm-@comment.id" style="display: none;">
+                                                                <div>
+                                                                    @using (Html.BeginForm("LeavePriorityComment", "Post", FormMethod.Post))
+                                                                    {
+                                                                        @Html.AntiForgeryToken()
+                                                                        @Html.HiddenFor(m => m.CommentModel.ParentId)
+                                                                        @Html.HiddenFor(m => m.Post.id)
+
+                                                                        <div class="input-grids">
+                                                                            <div class="form-group">
+                                                                                @Html.TextBoxFor(m => m.CommentModel.AuthorName, new { @class = "form-control", @readonly = "readonly", @Value = user.firstName + " " + user.lastName })
+                                                                                @Html.ValidationMessageFor(m => m.CommentModel.AuthorName, "", new { @class = "text-danger" })
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                @Html.TextAreaFor(m => m.CommentModel.Content, new { @class = "form-control", placeholder = "Twój komentarz", required = "required", id = "CommentModel_Content" })
+                                                                                @Html.ValidationMessageFor(m => m.CommentModel.Content, "", new { @class = "text-danger" })
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="submit text-right">
+                                                                            <button type="submit" class="btn btn-style btn-primary">Odpowiedz</button>
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="leave-comment-form" id="comment">
+                                        <h3 class="aside-title">Zostaw komentarz</h3>
+                                        @using (Html.BeginForm("LeavePriorityComment", "Post", FormMethod.Post))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            @Html.HiddenFor(m => m.CommentModel.ParentId)
+                                            @Html.HiddenFor(m => m.Post.id)
+
+                                            <div class="input-grids">
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.CommentModel.AuthorName, new { @class = "form-control", @readonly = "readonly", @Value = user.firstName + " " + user.lastName })
+                                                    @Html.ValidationMessageFor(m => m.CommentModel.AuthorName, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.TextAreaFor(m => m.CommentModel.Content, new { @class = "form-control", placeholder = "Twój komentarz", required = "required", id = "CommentModel_Content" })
+                                                    @Html.ValidationMessageFor(m => m.CommentModel.Content, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                            <div class="submit text-right">
+                                                <button type="submit" class="btn btn-style btn-primary">Wyślij komentarz</button>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </dd>
     </dl>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $(".reply-link-root, .reply-link-sub").click(function () {
+            $(".comment-form-to-hide").hide();
+
+            // Get the parentId from the clicked link
+            var parentId = $(this).data("parentid");
+
+            // Toggle visibility of the corresponding reply form
+            $("#replyForm-" + parentId).toggle();
+
+            // Set the parentId in the hidden field
+            $("#CommentModel_ParentId").val(parentId);
+
+            // Scroll to the comment form (optional)
+            $('html, body').animate({
+                scrollTop: $("#replyForm-" + parentId).offset().top
+            }, 500);
+
+            // Focus on the comment content textarea
+            $("#CommentModel_Content").focus();
+
+            return false; // Prevent default link behavior
+        });
+    });
+</script>
+
+
+<script>
+    // Submit the form when the checkbox is clicked
+    document.getElementById('visibilityToggle').addEventListener('change', function () {
+        document.getElementById('submitButton').click();
+    });
+</script>

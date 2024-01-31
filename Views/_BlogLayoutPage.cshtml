@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>Blog</title>
     <link href="~/css/style-liberty.css" rel="stylesheet" />
+    <link href="~/css/style-custom.css" rel="stylesheet" />
     <a href="~/fonts/fontawesome-webfont.eot"></a>
     <a href="~/fonts/fontawesome-webfont.ttf"></a>
     <a href="~/fonts/fontawesome-webfont.woff"></a>
@@ -33,16 +34,18 @@
                     <span class="fa icon-close fa-times"></span>
                 </button>
 
-                <div class="collapse navbar-collapse ml-5" id="navbarSupportedContent">
-                    <div class="col-lg-8">
-                        <div class="search-bar">
-                            <form class="search">
-                                <input type="search" class="search__input" name="search" placeholder="Discover news, articles and more"
-                                       onload="equalWidth()" required>
-                                <span class="fa fa-search search__icon"></span>
-                            </form>
-                        </div>
-                    </div>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Home")">Strona główna</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Categories", "Home")">Kategorie</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Tags", "Home")">Tagi</a>
+                        </li>
+                    </ul>
                 </div>
             </nav>
         </div>

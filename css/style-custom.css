@@ -1,0 +1,49 @@
+﻿.custom-file-input {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.custom-file-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.custom-file-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.image-preview-sq {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.image-preview-sq-sm {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+
+.image-preview-sq-lg {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+}
+
+.image-preview {
+    width: 500px;
+    height: auto;
+    object-fit: cover;
+}
+
+.image-preview-sm {
+    width: 100px;
+    height: auto;
+    object-fit: cover;
+}
+
+.hidden {
+    display: none;
+}
