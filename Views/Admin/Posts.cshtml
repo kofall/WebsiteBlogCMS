@@ -90,14 +90,14 @@
                                 }
                             </td>
                             <td>
-                                @if (!item.published)
+                                @if (WebsiteBlogCMS.Classes.DataHelper.UserUtils.HasPermission(2, User.Identity.Name) && !item.published)
                                 {
-                                    @Html.ActionLink("Zatwierdź", "Confirm", "Post", new { id = item.id }, new { @class = "btn btn-primary", type = "button" })
+                                        @Html.ActionLink("Zatwierdź", "Confirm", "Post", new { id = item.id }, new { @class = "btn btn-primary", type = "button" })
                                 }
 
-                                @Html.ActionLink("Edytuj", "Edit", "Post", new { id = item.id }, new { @class = "btn btn-warning", type = "button" })
-                                @Html.ActionLink("Szczegóły", "Preview", "Post", new { id = item.id }, new { @class = "btn btn-info", type = "button" })
-                                <button type="button" class="btn btn-danger" data-toggle="modal" onclick="loadPartialView('Delete', @item.id)">
+                                @Html.ActionLink("Edytuj", "Edit", "Post", new { id = item.id }, new { @class = "btn btn-warning mt-1", type = "button" })
+                                @Html.ActionLink("Szczegóły", "Preview", "Post", new { id = item.id }, new { @class = "btn btn-info mt-1", type = "button" })
+                                <button type="button" class="btn btn-danger mt-1" data-toggle="modal" onclick="loadPartialView('Delete', @item.id)">
                                     Usuń
                                 </button>
                             </td>

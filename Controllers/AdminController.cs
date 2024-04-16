@@ -49,6 +49,12 @@ namespace WebsiteBlogCMS.Controllers
         {
             using (var ctx = DbHelper.DataContext)
             {
+                if(string.IsNullOrEmpty(account.Login) || string.IsNullOrEmpty(account.Password))
+                {
+                    TempData[Message(MessageType.Warning)] = "Podany login oraz hasło są niepoprawne.";
+                    return View();
+                }
+
                 User user = UserUtils.AuthenticateUser(ctx, account.Login, account.Password);
 
                 if (user == null)

@@ -3,32 +3,38 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace WebsiteBlogCMS.Classes
 {
     public static class HtmlHelper
     {
-        public static IHtmlString TruncateHtml(string html, int length)
+        public static string TruncateHtml(string htmlContent, int maxLength)
         {
-            if (string.IsNullOrEmpty(html))
-                return new HtmlString(string.Empty);
+            if (string.IsNullOrEmpty(htmlContent) || maxLength <= 0)
+                return string.Empty;
 
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
+            // Remove HTML tags from the content
+            string plainText = Regex.Replace(htmlContent, "<.*?>", "");
 
-            var sb = new StringBuilder();
+            // Truncate plain text to the specified length
+            if (plainText.Length <= maxLength)
+                return htmlContent;
 
-            foreach (var node in doc.DocumentNode.ChildNodes)
+            string truncatedPlainText = plainText.Substring(0, maxLength);
+
+            // Find the last tag in the truncated plain text
+            Match lastTagMatch = Regex.Match(truncatedPlainText, "<[^>]+>$");
+
+            if (lastTagMatch.Success)
             {
-                if (node.NodeType == HtmlNodeType.Element && node.Name.ToLower() == "p")
-                {
-                    var truncatedText = TruncateParagraph(node, length);
-                    sb.Append(truncatedText);
-                }
+                // Append the closing tag if necessary
+                string closingTag = lastTagMatch.Value;
+                truncatedPlainText += closingTag;
             }
 
-            return new HtmlString(sb.ToString());
+            return truncatedPlainText;
         }
 
         private static string TruncateParagraph(HtmlNode paragraphNode, int length)

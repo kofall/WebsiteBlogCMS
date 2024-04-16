@@ -1,7 +1,7 @@
-﻿@model WebsiteBlogCMS.Data.Post
+﻿@model WebsiteBlogCMS.Models.Validation.PostModel
 
-<div class="modal fade" id="DeletePost-@Model.id" aria-labelledby="DeletePostLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+<div class="modal fade" id="DeletePost-@Model.Id" aria-labelledby="DeletePostLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="DeletePostLabel">Czy jesteś pewien, że chcesz usunąć ten post?</h5>
@@ -15,47 +15,7 @@
                         Tytuł
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.title)
-                    </dd>
-
-                    <dt class="col-sm-4">
-                        Utworzono
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.createdAt)
-                    </dd>
-
-                    @if (Model.updatedAt != null)
-                    {
-                        <dt class="col-sm-4">
-                            Zaktualizowano
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.updatedAt)
-                        </dd>
-                    }
-
-                    <dt class="col-sm-4">
-                        Status
-                    </dt>
-                    <dd class="col-sm-8">
-                        @if (Model.published)
-                        {
-                            @Html.Display("Niepubliczny")
-                        }
-                        else
-                        {
-                            @Html.Display("Publiczny")
-                        }
-                    </dd>
-
-                    </dd>
-
-                    <dt class="col-sm-4">
-                        Opublikowano
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.publishedAt)
+                        @Html.DisplayFor(model => model.Title)
                     </dd>
                 </dl>
                 @using (Html.BeginForm("Delete", "Post", FormMethod.Post))
@@ -63,7 +23,7 @@
                     @Html.AntiForgeryToken()
 
                     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                    @Html.HiddenFor(model => model.id)
+                    @Html.HiddenFor(model => model.Id)
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>

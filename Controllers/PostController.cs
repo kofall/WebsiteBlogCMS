@@ -132,10 +132,38 @@ namespace WebsiteBlogCMS.Controllers
         }
 
         [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteComment(int commentId)
+        {
+            using (var ctx = DbHelper.DataContext)
+            {
+                Comment comment = CommentUtils.GetComment(ctx, commentId);
+                int postId = comment.postId;
+                try
+                {
+                    if (comment != null)
+                    {
+                        ctx.Comments.DeleteOnSubmit(comment);
+                        ctx.SubmitChanges();
+
+                        TempData[Message(MessageType.Success)] = "Pomyślnie usunięto komentarz.";
+                    }
+                    return RedirectToAction("Preview", "Post", new { id = postId });
+                }
+                catch
+                {
+                    TempData[Message(MessageType.Error)] = "Nie udało się usunąć komentarza.";
+                    return RedirectToAction("Preview", "Post", new { id = postId });
+                }
+            }
+        }
+
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult LeaveComment(PostDetailsModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 CommentModel commentModel = model.CommentModel;
                 model = GetPostDetails(model.Post.id);
@@ -190,6 +218,7 @@ namespace WebsiteBlogCMS.Controllers
 
                 ctx.Comments.InsertOnSubmit(comment);
                 ctx.SubmitChanges();
+                TempData[Message(MessageType.Success)] = "Pomyślnie dodano komentarz.";
             }
 
             return RedirectToAction("Preview", new { id = model.Post.id });
@@ -310,7 +339,7 @@ namespace WebsiteBlogCMS.Controllers
                 {
                     bool isSelected = false;
 
-                    if(selectedCategories != null)
+                    if (selectedCategories != null)
                     {
                         isSelected = selectedCategories.Split(',').ToList().Contains(c.id.ToString());
                     }
@@ -323,7 +352,7 @@ namespace WebsiteBlogCMS.Controllers
                     );
                 });
                 ViewBag.Categories = Newtonsoft.Json.JsonConvert.SerializeObject(categories, jsonSettings);
-                if(string.IsNullOrEmpty(selectedCategories))
+                if (string.IsNullOrEmpty(selectedCategories))
                 {
                     errorMessages += "Kategoria jest wymagana. ";
                 }
@@ -558,7 +587,7 @@ namespace WebsiteBlogCMS.Controllers
                     return View(model);
                 }
 
-                Post post = PostUtils.GetPost(ctx, model.Title);
+                Post post = PostUtils.GetPost(ctx, model.Id);
 
                 if (post == null)
                 {
@@ -585,7 +614,7 @@ namespace WebsiteBlogCMS.Controllers
                 {
                     post.title = model.Title;
                     post.content = model.Content;
-                    post.isVisible = model.IsVisible;   
+                    post.isVisible = model.IsVisible;
                     post.updatedAt = DateTime.Now;
 
                     var deleteCategories = ctx.PostCategories.Where(x => x.postId.Equals(post.id)).ToList();
@@ -750,47 +779,24 @@ namespace WebsiteBlogCMS.Controllers
         {
             using (var ctx = DbHelper.DataContext)
             {
-                Post data = new Post();
+                PostModel model = new PostModel();
 
                 if (operation != "Create")
                 {
-                    data = PostUtils.GetPost(ctx, id);
-
-                    if (data == null)
+                    Post post = PostUtils.GetPost(ctx, id);
+                    if (post == null)
                     {
                         return HttpNotFound();
                     }
+                    model.Id = post.id;
+                    model.Title = post.title;
+                    model.Content = post.content;
+                    model.Published = post.published;
+                    model.IsVisible = post.isVisible;
+                    model.Image = post.image.ToArray();
                 }
 
-                var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
-                {
-                    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-                };
-
-                var categories = ctx.Categories.Select(c => new DropDownItem
-                (
-                    c.title,
-                    c.id,
-                    ctx.PostCategories
-                        .Where(x => x.postId.Equals(id) && x.categoryId.Equals(c.id))
-                        .Select(x => x.categoryId).Any()
-                ));
-                ViewBag.Categories = Newtonsoft.Json.JsonConvert.SerializeObject(categories, jsonSettings);
-
-                var tags = ctx.Tags.Select(t => new DropDownItem
-                (
-                    t.title,
-                    t.id,
-                    ctx.PostTags
-                        .Where(x => x.postId.Equals(id) && x.tagId.Equals(t.id))
-                        .Select(x => x.tagId).Any()
-                ));
-                ViewBag.Tags = Newtonsoft.Json.JsonConvert.SerializeObject(tags, jsonSettings);
-
-                var content = ctx.Posts.Where(p => p.id.Equals(id)).Select(p => p.content).SingleOrDefault();
-                ViewBag.Content = Newtonsoft.Json.JsonConvert.SerializeObject(content, jsonSettings);
-
-                return PartialView($"_{operation}PostPartialView", data);
+                return PartialView($"_{operation}PostPartialView", model);
             }
         }
     }

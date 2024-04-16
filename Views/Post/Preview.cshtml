@@ -119,6 +119,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="text11-content mb-5">
+                                    @Html.Partial("../Shared/_Message")
                                     <div class="comments">
                                         <h3 class="aside-title ">Komentarze (@Model.CommentsCount)</h3>
                                         <div class="comments-grids">
@@ -127,7 +128,13 @@
                                                 <div class="media-grid">
                                                     <div class="media">
                                                         <div class="media-body comments-grid-right">
-                                                            <h5>
+                                                            @using (Html.BeginForm("DeleteComment", "Post", FormMethod.Post, new { id = $"deleteForm-{comment.id}" }))
+                                                            {
+                                                                @Html.AntiForgeryToken()
+                                                                @Html.Hidden("commentId", comment.id)
+                                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                            }
+                                                            <h5 class="mt-1">
                                                                 @comment.authorName
                                                                 @if (comment.authorId != null)
                                                                 {
@@ -138,7 +145,7 @@
                                                             <ul class="p-0 comment">
                                                                 <li class="">@comment.publishedAt</li>
                                                                 <li>
-                                                                    <a href="#replyForm-@comment.id" class="text-primary reply-link-root" data-author="@comment.authorName" data-parentid="@comment.id">Odpowiedz</a>
+                                                                    <a href="#replyForm-@comment.id" class="btn text-primary reply-link-root" data-author="@comment.authorName" data-parentid="@comment.id">Odpowiedz</a>
                                                                 </li>
                                                             </ul>
                                                             <p>
@@ -151,7 +158,13 @@
 
                                                                 <div class="media mt-4 mb-0 border-0 px-0 pb-0">
                                                                     <div class="media-body comments-grid-right">
-                                                                        <h5>
+                                                                        @using (Html.BeginForm("DeleteComment", "Post", FormMethod.Post, new { id = $"deleteForm-{subComment.id}" }))
+                                                                        {
+                                                                            @Html.AntiForgeryToken()
+                                                                            @Html.Hidden("commentId", subComment.id)
+                                                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                                        }
+                                                                        <h5 class="mt-1">
                                                                             @subComment.authorName
                                                                             @if (subComment.authorId != null)
                                                                             {
@@ -162,11 +175,12 @@
                                                                         <ul class="p-0 comment">
                                                                             <li class="">@subComment.publishedAt</li>
                                                                             <li>
-                                                                                <a href="#replyForm-@subComment.id" class="text-primary reply-link-sub" data-author="@subComment.authorName" data-parentid="@subComment.id">Odpowiedz</a>
+                                                                                <a href="#replyForm-@subComment.id" class="btn text-primary reply-link-sub" data-author="@subComment.authorName" data-parentid="@subComment.id">Odpowiedz</a>
                                                                             </li>
                                                                         </ul>
                                                                         <p>
                                                                             <span style="color: #5A67D8;">@parent.authorName</span> @subComment.content
+                                                                            @*<a href="#" class="btn btn-danger btn-sm delete-comment" data-comment-id="@comment.id">Delete</a>*@
                                                                         </p>
 
                                                                         <div class="leave-comment-form comment-form-to-hide" data-parent-id="@subComment.id" id="replyForm-@subComment.id" style="display: none;">

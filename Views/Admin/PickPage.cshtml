@@ -53,9 +53,16 @@
                                 </td>
                                 <td>@item.Title</td>
                                 <td>
-                                    <button type="button" class="btn btn-info" data-toggle="modal" onclick="loadPartialView('Detail', @item.ItemId, '@ViewBag.Controller')">
-                                        Szczegóły
-                                    </button>
+                                    @if (ViewBag.Controller == "Category")
+                                    {
+                                        <button type="button" class="btn btn-info" data-toggle="modal" onclick="loadPartialView('Detail', @item.ItemId, '@ViewBag.Controller')">
+                                            Szczegóły
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        @Html.ActionLink("Szczegóły", "Preview", "Post", new { id = item.ItemId }, new { @class = "btn btn-info", type = "button" })
+                                    }
                                 </td>
                             </tr>
                         }

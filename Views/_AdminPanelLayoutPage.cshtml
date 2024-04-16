@@ -8,6 +8,10 @@
     {
         User user = WebsiteBlogCMS.Classes.DataHelper.UserUtils.GetUser(User.Identity.Name);
         var image = user.profileImage?.ToArray() ?? null;
+        if(image == null)
+        {
+            return string.Empty;
+        }
         return Convert.ToBase64String(image);
     }
 }

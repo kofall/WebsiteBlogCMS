@@ -34,10 +34,10 @@
                 </ul>
             </div>
         </div>
-        <div class="image mb-sm-5 mb-4">
+        <div class="image mb-sm-5 mb-4" style="width: 100%; height: 500px; overflow: hidden;">
             @if (Model.Post.image != null && Model.Post.image.Length > 0)
             {
-                <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(Model.Post.image.ToArray()))" alt="Image" class="img-fluid radius-image-full" />
+                <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(Model.Post.image.ToArray()))" alt="Image" class="img-fluid radius-image-full" style="width: 100%; height: 100%; object-fit: cover;" />
             }
         </div>
         <div class="container">
@@ -256,7 +256,7 @@
                                         <figure class="post-thumb">
                                             @if (post.image != null && post.image.Length > 0)
                                             {
-                                                <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(post.image.ToArray()))" alt="Image" />
+                                                <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(post.image.ToArray()))" alt="Image" class="img-fluid image-preview-sq" />
                                             }
                                         </figure>
                                         <div class="text">

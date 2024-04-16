@@ -61,7 +61,7 @@
         <!-- block -->
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <h3 class="section-title-left mb-4"> Editor's Pick </h3>
+                <h3 class="section-title-left mb-4"> Wybór redakcyjny </h3>
                 <div class="row">
                     @foreach (var item in Model.EditorsPicks)
                     {
@@ -89,16 +89,16 @@
                                         @item.title
                                     </a>
                                     <p>
-                                        @WebsiteBlogCMS.Classes.HtmlHelper.TruncateHtml(item.content, 50)
+                                        @Html.Raw(@WebsiteBlogCMS.Classes.HtmlHelper.TruncateHtml(item.content, 250))...
                                     </p>
                                     <div class="author align-items-center mt-3 mb-1">
                                         @if (item.User.profileImage != null && item.User.profileImage.Length > 0)
                                         {
-                                            <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(item.User.profileImage.ToArray()))" alt="Image" class="img-fluid rounded-circle" />
+                                            <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(item.User.profileImage.ToArray()))" alt="Image" class="img-fluid rounded-circle" style="width: 60px; height: 60px" />
                                         }
                                         <ul class="blog-meta">
                                             <li>
-                                                <a href="author.html">@item.User.firstName @item.User.lastName</a>
+                                                <a href="@Url.Action("Details", "User", new { id = item.authorId })">@item.User.firstName @item.User.lastName</a>
                                             </li>
                                             <li class="meta-item blog-lesson">
                                                 <span class="meta-value">@item.publishedAt</span>
@@ -116,12 +116,12 @@
 </div>
 <div class="w3l-homeblock3 py-5">
     <div class="container py-lg-5 py-md-4">
-        <h3 class="section-title-left mb-4"> Top Pick's of this month </h3>
+        <h3 class="section-title-left mb-4"> Posty miesiąca </h3>
         <div class="row top-pics justify-content-center">
             @foreach (var item in Model.TopMonthPicks)
             {
                 <div class="col-lg-4 col-md-6">
-                    <div id="profileImage" style="background-image: @(item.image != null ? $"url('data:image/*;base64,{Convert.ToBase64String(item.image.ToArray())}')": "none");">
+                    <div id="profileImage" style="background-image: @(item.image != null ? $"url('data:image/*;base64,{Convert.ToBase64String(item.image.ToArray())}')": "none");" class="card-img-bottom d-block radius-image-full">
                         <div class="card-body blog-details">
                             <a href="@Url.Action("Details", "Post", new { item.id })" class="blog-desc">
                                 @item.title
@@ -129,11 +129,11 @@
                             <div class="author align-items-center">
                                 @if (item.User.profileImage != null && item.User.profileImage.Length > 0)
                                 {
-                                    <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(item.User.profileImage.ToArray()))" alt="Image" class="img-fluid rounded-circle" />
+                                    <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(item.User.profileImage.ToArray()))" alt="Image" class="img-fluid rounded-circle" style="width: 60px; height: 60px" />
                                 }
                                 <ul class="blog-meta">
                                     <li>
-                                        <a href="author.html">@item.User.firstName @item.User.lastName</a>
+                                        <a href="@Url.Action("Details", "User", new { id = item.authorId })">@item.User.firstName @item.User.lastName</a>
                                     </li>
                                     <li class="meta-item blog-lesson">
                                         <span class="meta-value"> @item.publishedAt </span>
@@ -150,7 +150,7 @@
 <div class="w3l-homeblock2 w3l-homeblock6 py-5">
     <div class="container-fluid px-sm-5 py-lg-5 py-md-4">
         <!-- block -->
-        <h3 class="section-title-left mb-4"> Trending Now</h3>
+        <h3 class="section-title-left mb-4"> Popularne posty</h3>
         <div class="row justify-content-center">
             @foreach (var item in Model.TopPicks)
             {
@@ -161,7 +161,7 @@
                                 <a href="@Url.Action("Details", "Post", new { @item.id })">
                                     @if (item.image != null && item.image.Length > 0)
                                     {
-                                        <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(item.image.ToArray()))" alt="Image" class="card-img-bottom d-block radius-image-full" />
+                                        <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(item.image.ToArray()))" alt="Image" class="card-img-bottom d-block radius-image-full" style="height: 100%; object-fit:cover" />
                                     }
                                 </a>
                             </div>
@@ -179,16 +179,16 @@
                                     @item.title
                                 </a>
                                 <p>
-                                    @WebsiteBlogCMS.Classes.HtmlHelper.TruncateHtml(item.content, 50)
+                                    @Html.Raw(@WebsiteBlogCMS.Classes.HtmlHelper.TruncateHtml(item.content, 250))...
                                 </p>
                                 <div class="author align-items-center mt-3">
                                     @if (item.User.profileImage != null && item.User.profileImage.Length > 0)
                                     {
-                                        <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(item.User.profileImage.ToArray()))" alt="Image" class="img-fluid rounded-circle" />
+                                        <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(item.User.profileImage.ToArray()))" alt="Image" class="img-fluid rounded-circle" style="width: 60px; height: 60px" />
                                     }
                                     <ul class="blog-meta">
                                         <li>
-                                            <a href="author.html">@item.User.firstName @item.User.lastName</a>
+                                            <a href="@Url.Action("Details", "User", new { id = item.authorId })">@item.User.firstName @item.User.lastName</a>
                                         </li>
                                         <li class="meta-item blog-lesson">
                                             <span class="meta-value"> @item.publishedAt </span>
