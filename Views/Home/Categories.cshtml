@@ -1,0 +1,91 @@
+﻿@model PagedList.IPagedList<WebsiteBlogCMS.Data.Category>
+
+@using PagedList.Mvc
+
+@{
+    Layout = "~/Views/_BlogLayoutPage.cshtml";
+}
+
+<div class="w3l-homeblock2 w3l-homeblock5 py-5">
+    <div class="container pt-md-4 pb-md-5">
+        <h3 class="category-title mb-3">Lista kategorii</h3>
+
+        <hr class="border-hr" />
+        @if (Model.Any())
+        {
+            <section class="w3l-homeblock1">
+                <div class="container">
+                    <div class="grids-area-hny main-cont-wthree-fea row justify-content-center">
+                        @foreach (var item in Model)
+                        {
+                            <div class="col-lg-3 col-6 grids-feature">
+                                <a href="@Url.Action("PostsOfCategory", "Post", new { id = item.id })">
+                                    <div class="area-box">
+                                        <h4 class="title-head">@item.title</h4>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </section>
+        }
+        else
+        {
+            <p class="mb-sm-5 mb-4 max-width">Brak kategorii</p>
+        }
+        <hr />
+
+        <div class="site-pagination text-center mt-md-5 mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                @{
+                    if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Categories", new { page = Model.PageNumber - 1 })" aria-label="Previous">
+                                <span aria-hidden="true" style="user-select: none;">&laquo;</span>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <span class="page-link" aria-hidden="true" style="user-select: none;">&laquo;</span>
+                        </li>
+                    }
+
+                    for (var i = 1; i <= Model.PageCount; i++)
+                    {
+                        if (i == Model.PageNumber)
+                        {
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link" style="user-select: none;">@i</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Categories", new { page = i })" style="user-select: none;">@i</a>
+                            </li>
+                        }
+                    }
+
+                    if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Categories", new { page = Model.PageNumber + 1 })" aria-label="Next">
+                                <span aria-hidden="true" style="user-select: none;">&raquo;</span>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <span class="page-link" aria-hidden="true" style="user-select: none;">&raquo;</span>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+</div>

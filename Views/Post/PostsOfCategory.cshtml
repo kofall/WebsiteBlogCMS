@@ -1,0 +1,139 @@
+﻿@model WebsiteBlogCMS.Models.PostsOfCategoryModel
+@using PagedList.Mvc
+
+@{
+    Layout = "~/Views/_BlogLayoutPage.cshtml";
+}
+
+<div class="w3l-homeblock2 w3l-homeblock5 py-5">
+    <div class="container pt-md-4 pb-md-5">
+        <!-- block -->
+        @if (Model.ParentCategory != null)
+        {
+            <p class="mb-3">
+                @Html.ActionLink($"Przejdź do kategorii nadrzędnej: {Model.ParentCategory.title}", "PostsOfCategory", "Post", new { id = Model.ParentCategory.id }, null)
+            </p>
+        }
+        <h3 class="category-title mb-3">@Model.Category.title</h3>
+        <p class="mb-sm-5 mb-4 max-width">@Model.Category.content</p>
+        <!-- /homeblock1-->
+        @if (Model.SubCategories.Any())
+        {
+            <hr class="border-hr" />
+            <section class="w3l-homeblock1">
+                <div class="container">
+                    <div class="grids-area-hny main-cont-wthree-fea row justify-content-center">
+                        @foreach (var item in Model.SubCategories)
+                        {
+                            <div class="col-lg-3 col-6 grids-feature">
+                                <a href="@Url.Action("PostsOfCategory", "Post", new { id = item.id })">
+                                    <div class="area-box">
+                                        <h4 class="title-head">@item.title</h4>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </section>
+            <hr />
+        }
+        <!-- //homeblock1-->
+
+        <div class="row">
+            @if (Model.Posts.Any())
+            {
+                foreach (var post in Model.Posts)
+                {
+                    <div class="col-lg-6 mt-4">
+                        <div class="bg-clr-white hover-box">
+                            <div class="row">
+                                <div class="col-sm-5 position-relative">
+                                    <a href="@Url.Action("Details", "Post", new { id = post.id })" class="image-mobile">
+                                        @if (post.image != null && post.image.Length > 0)
+                                        {
+                                            <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(post.image.ToArray()))" alt="Image" class="card-img-bottom d-block radius-image-full" style="height:100%;object-fit:cover" />
+                                        }
+                                    </a>
+                                </div>
+                                <div class="col-sm-7 card-body blog-details align-self">
+                                    @Html.ActionLink($"{post.title}", "Details", "Post", new { id = post.id }, new { @class = "blog-desc" })
+                                    <div class="author align-items-center">
+                                        @if (post.User.profileImage != null && post.User.profileImage.Length > 0)
+                                        {
+                                            <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(post.User.profileImage.ToArray()))" alt="Image" class="img-fluid rounded-circle" />
+                                        }
+                                        <ul class="blog-meta">
+                                            <li>
+                                                @Html.ActionLink($"{WebsiteBlogCMS.Classes.DataHelper.UserUtils.GetUserName(post.authorId)}", "Details", "User", new { id = post.authorId }, null)
+                                            </li>
+                                            <li class="meta-item blog-lesson">
+                                                <span class="meta-value"> @post.createdAt </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="mb-sm-5 mb-4 max-width">Brak postów dla danej kategorii</p>
+            }
+        </div>
+
+        <div class="site-pagination text-center mt-md-5 mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                @{
+                    if (Model.Posts.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("PostsOfCategory", new { page = Model.Posts.PageNumber - 1, id = Model.Category.id })" aria-label="Previous">
+                                <span aria-hidden="true" style="user-select: none;">&laquo;</span>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <span class="page-link" aria-hidden="true" style="user-select: none;">&laquo;</span>
+                        </li>
+                    }
+
+                    for (var i = 1; i <= Model.Posts.PageCount; i++)
+                    {
+                        if (i == Model.Posts.PageNumber)
+                        {
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link" style="user-select: none;">@i</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("PostsOfCategory", new { page = i, id = Model.Category.id })" style="user-select: none;">@i</a>
+                            </li>
+                        }
+                    }
+
+                    if (Model.Posts.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("PostsOfCategory", new { page = Model.Posts.PageNumber + 1, id = Model.Category.id })" aria-label="Next">
+                                <span aria-hidden="true" style="user-select: none;">&raquo;</span>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <span class="page-link" aria-hidden="true" style="user-select: none;">&raquo;</span>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+</div>

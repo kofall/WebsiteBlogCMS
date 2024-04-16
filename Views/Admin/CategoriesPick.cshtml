@@ -1,0 +1,139 @@
+﻿@model IEnumerable<WebsiteBlogCMS.Models.PickOrderItemViewModel>
+
+@{
+    ViewBag.Title = "Wybierz kategorie";
+    Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
+}
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.2/dist/bootstrap-table.min.css">
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js" integrity="sha256-d3rtug+Hg1GZPB7Y/yTcRixO/wlI78+2m08tosoRn7A=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Wybór kategorii</h1>
+    <p class="mb-sm-5 mb-4 max-width">Lista zawiera wyłącznie kategorie, które są przypisane do co najmniej jednego widocznego dla czytelników posta.</p>
+    @Html.Partial("../Shared/_Message")
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-table me-1"></i> Lista</span>
+            </div>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("SaveCategoriesPick", "Category", FormMethod.Post))
+            {
+                <table id="datatablesSimple">
+                    <thead>
+                        <tr>
+                            <th data-no-drag>Position</th>
+                            <th>Widoczny</th>
+                            <th>Title</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th data-no-drag>Position</th>
+                            <th>Widoczny</th>
+                            <th>Title</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var item in Model.OrderBy(m => m.Position).ThenBy(m => m.Title))
+                        {
+                            <tr id="@item.ItemId">
+                                <td><span class="position-value">@item.Position</span></td>
+                                <td>
+                                    <input type="checkbox" name="rowCheckbox" value="@item.ItemId" @(item.IsSelected ? "checked" : "")>
+                                </td>
+                                <td>@item.Title</td>
+                                <td>
+                                    <button type="button" class="btn btn-info" data-toggle="modal" onclick="loadPartialView('Detail', @item.ItemId)">
+                                        Szczegóły
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary">Zapisz</button>
+            }
+
+            <div id="myModal">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var $j = jQuery.noConflict(); // Use this only once
+
+    $j(document).ready(function () {
+        var table = $j("#datatablesSimple");
+
+        // Initialize the tableDnD
+        table.tableDnD({
+            onDragStart: function (table, row) {
+                console.log("onDragStart");
+                // Store the initial order of rows for later use
+                table.initialOrder = $j.makeArray($j(table.rows).map(function () {
+                    return this.id;
+                }));
+            },
+            sensitivity: 1, // Set the sensitivity to 1 pixel for more precise dragging
+            serializeRegexp: /[^\-]*$/, // Default regex to include all rows
+        });
+
+        table.on("mouseup", function (event) {
+            console.log("Mouse up event");
+            updatePositionValues();
+        });
+
+        updatePositionValues();
+
+        // Handle checkbox change event
+        $j("input[name='rowCheckbox']").change(function () {
+            updatePositionValues();
+        });
+
+        // Update position values based on checkbox status
+        function updatePositionValues() {
+            var position = 1;
+            $j("tbody tr").each(function () {
+                var checkbox = $j(this).find("input[name='rowCheckbox']");
+                var positionSpan = $j(this).find(".position-value");
+
+                if (checkbox.prop("checked")) {
+                    positionSpan.text(position);
+                    position++;
+                } else {
+                    positionSpan.text("");
+                }
+            });
+        }
+    });
+</script>
+
+
+<script>
+    function loadPartialView(operation, id) {
+        var url = '@Url.Action("LoadCategoryPartialView", "Category")';
+
+        $j.ajax({
+            url: url,
+            type: 'GET',
+            data: { operation: operation, id: id },
+            success: function (data) {
+                $j('#myModal').html(data);
+                $j('#' + operation + 'Category-' + id).modal('show');
+            },
+            error: function () {
+                alert('Error loading partial view.');
+            }
+        });
+    }
+</script>

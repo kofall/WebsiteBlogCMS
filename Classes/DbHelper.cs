@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
-using static WebsiteBlogCMS.Classes.Enums;
-using static WebsiteBlogCMS.Classes.ProgramVariables;
+﻿using System;
+using System.Data.Entity;
+using System.Data.Linq;
+using System.Transactions;
+using WebsiteBlogCMS.Data;
 
 namespace WebsiteBlogCMS.Classes
 {
@@ -13,26 +15,18 @@ namespace WebsiteBlogCMS.Classes
             get
             {
                 return ConnectionString
-                    .Replace("#server#", ServerNames[DATABASE])
-                    .Replace("#dbname#", DatabaseNames[COMPANY])
+                    .Replace("#server#", ServerName)
+                    .Replace("#dbname#", DatabaseName)
                     .Replace("#userid#", ServerUserId)
                     .Replace("#password#", ServerPassword);
             }
         }
 
-        private static readonly Dictionary<DatabaseType, string> ServerNames = new Dictionary<DatabaseType, string>
-        {
-            { DatabaseType.Local, "(localdb)\\Local" },
-            { DatabaseType.Public, string.Empty }
-        };
-
-        private static readonly Dictionary<CompanyType, string> DatabaseNames = new Dictionary<CompanyType, string>
-        {
-            { CompanyType.Production, "BlogDB" },
-            { CompanyType.Test, "BlogDBTest" }
-        };
-
+        private static readonly string ServerName = "(localdb)\\Local";
+        private static readonly string DatabaseName = "BlogDB";
         private static readonly string ServerUserId = "admin";
         private static readonly string ServerPassword = "admin";
+
+        public static BlogDBDataContext DataContext => new BlogDBDataContext(ConnectionBlog);
     }
 }

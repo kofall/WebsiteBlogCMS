@@ -1,8 +1,7 @@
-﻿@model WebsiteBlogCMS.Data.User
+﻿@model WebsiteBlogCMS.Models.UserDetailsModel
 
 @{
-    ViewBag.Title = "Details";
-    Layout = "~/Views/_LayoutPage1.cshtml";
+    Layout = "~/Views/_BlogLayoutPage.cshtml";
 }
 
 <!-- single user -->
@@ -11,7 +10,7 @@
         <div class="container">
             <div class="blog-title px-md-5">
                 <h3 class="title-big">
-                    Profile
+                    Profil
                 </h3>
                 <ul class="blog-list">
                 </ul>
@@ -22,77 +21,122 @@
                 <div class="col-lg-12">
                     <div class="text11-content">
                         <div class="author-detalis">
-                            <dev class="author-image" >
-                                <img src="~/images/a2.jpg"
-                                     alt="author image" class="img-fluid">
+                            <dev class="author-image">
+                                @if (Model.User.profileImage != null && Model.User.profileImage.Length > 0)
+                                {
+                                    <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(Model.User.profileImage.ToArray()))" alt="Image" class="img-fluid rounded-circle" style="width: 100px; height: 100px;" />
+                                }
                             </dev>
                             <div class="author-info align-self-end">
-                                <h4 class="mt-sm-3">Isabella</h4>
+                                <h4 class="mt-sm-3">@WebsiteBlogCMS.Classes.DataHelper.UserUtils.GetUserName(Model.User.id)</h4>
                                 <ul class="blog-meta">
                                     <li>
                                         <span class="meta-value">
-                                            Last active: 2 hours ago
-                                        </span>
-                                    </li>
-                                    <li>
-                                        <span class="meta-value">
-                                            Email: <a href="">sample@gmail.com</a>
-                                        </span>
-                                    </li>
-                                    <li>
-                                        <span class="meta-value">
-                                            Role: Administrator
+                                            @Html.DisplayFor(model => model.User.Role.name)
                                         </span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
 
-                        <h4 class="mt-sm-3">About me</h4>
+                        <h4 class="mt-sm-3">O mnie</h4>
                         <p class="mt-4 mb-3">
-                            Nam eget tortor eu turpis ultrices lobortis. Vestibulum viverra ex sit amet accumsan tincidunt. Nulla pellentesque luctus diam et suscipit. Cras ultricies, quam a ultricies congue, nisi mi eleifend diam, eget facilisis nisi sapien eu metus. In hac habitasse platea dictumst. Interdum et malesuada fames ac ante ipsum primis in faucibus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Aliquam nec maximus nulla. Donec quis enim lacinia enim lobortis feugiat. Nam pellentesque molestie elit sed euismod. Aliquam vel faucibus orci. Ut vitae tincidunt ex, vel sodales nibh. Phasellus ac fringilla tellus, ut vestibulum ante. Quisque turpis odio, convallis malesuada est vitae, pretium placerat justo. Nullam sed tincidunt sapien. Fusce congue velit nunc, vel varius nisi ultrices nec. Fusce imperdiet molestie molestie. Quisque non felis sed nisl accumsan tincidunt.
+                            @Model.User.profile
                         </p>
-
-
-                        @Html.ActionLink("Edit", "Edit", "User", new { id = 0 }, new { @class = "btn btn-style btn-primary mt-4" })
-                        @Html.ActionLink("Delete", "Delete", "User", new { id = 0 }, new { @class = "btn btn-style btn-primary mt-4" })
                     </div>
                 </div>
             </div>
         </div>
         <div class="container">
-            <div class="blog-title px-md-5">
+            <div class="blog-title px-5">
                 <ul class="blog-list">
                 </ul>
                 <h3 class="aside-title">
-                    Author's posts(COUNT)
+                    Posty autora (@Model.User.Posts.Where(x => x.isVisible).ToList().Count())
                 </h3>
             </div>
         </div>
         <div class="container pt-md-4 pb-md-5">
             <div class="row">
-                <div class="col-lg-6">
-                    <div class="bg-clr-white hover-box">
-                        <div class="row">
-                            <div class="col-sm-5 position-relative">
-                                <a href="@Url.Action("Details", "Post", new { id = 0 })" class="image-mobile">
-                                    <img class="card-img-bottom d-block radius-image-full" src="~/images/beauty7.jpg" alt="Card image cap">
-                                </a>
-                            </div>
-                            <div class="col-sm-7 card-body blog-details align-self">
-                                @Html.ActionLink("Why you need a Spa Day, Reasons to get a Package", "Details", "Post", new { id = 0 }, new { @class = "blog-desc" })
-                                <div class="author align-items-center">
-                                    <ul class="blog-meta">
-                                        <li class="meta-item blog-lesson">
-                                            <span class="meta-value"> July 13, 2020 </span>. <span class="meta-value ml-2"><span class="fa fa-clock-o"></span> 1 min</span>
-                                        </li>
-                                    </ul>
+                @foreach (var post in Model.UserPosts)
+                {
+                    <div class="col-lg-6 mt-4">
+                        <div class="bg-clr-white hover-box">
+                            <div class="row">
+                                <div class="col-sm-5 position-relative">
+                                    <a href="@Url.Action("Details", "Post", new { id = post.id })" class="image-mobile">
+                                        @if (post.image != null && post.image.Length > 0)
+                                        {
+                                            <img id="imagePreview" src="data:image/*;base64,@(Convert.ToBase64String(post.image.ToArray()))" alt="Image" class="card-img-bottom d-block radius-image-full" style="height:100%;object-fit:cover"/>
+                                        }
+                                    </a>
+                                </div>
+                                <div class="col-sm-7 card-body blog-details align-self">
+                                    @Html.ActionLink($"{post.title}", "Details", "Post", new { id = post.id }, new { @class = "blog-desc" })
+                                    <div class="author align-items-center">
+                                        <ul class="blog-meta">
+                                            <li class="meta-item blog-lesson">
+                                                <span class="meta-value"> @post.createdAt </span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
+            </div>
+
+            <div class="site-pagination text-center mt-md-5 mt-4 d-flex justify-content-center">
+                <ul class="pagination">
+                    @{
+                        if (Model.UserPosts.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Details", new { page = Model.UserPosts.PageNumber - 1, id = Model.User.id })" aria-label="Previous">
+                                    <span aria-hidden="true" style="user-select: none;">&laquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <span class="page-link" aria-hidden="true" style="user-select: none;">&laquo;</span>
+                            </li>
+                        }
+
+                        for (var i = 1; i <= Model.UserPosts.PageCount; i++)
+                        {
+                            if (i == Model.UserPosts.PageNumber)
+                            {
+                                <li class="page-item active" aria-current="page">
+                                    <span class="page-link" style="user-select: none;">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Details", new { page = i, id = Model.User.id })" style="user-select: none;">@i</a>
+                                </li>
+                            }
+                        }
+
+                        if (Model.UserPosts.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Details", new { page = Model.UserPosts.PageNumber + 1, id = Model.User.id })" aria-label="Next">
+                                    <span aria-hidden="true" style="user-select: none;">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <span class="page-link" aria-hidden="true" style="user-select: none;">&raquo;</span>
+                            </li>
+                        }
+                    }
+                </ul>
             </div>
         </div>
     </div>

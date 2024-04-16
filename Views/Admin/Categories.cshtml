@@ -1,0 +1,100 @@
+﻿@model IEnumerable<WebsiteBlogCMS.Data.Category>
+
+@{
+    ViewBag.Title = "Kategorie";
+    Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Lista kategorii</h1>
+    @Html.Partial("../Shared/_Message")
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-table me-1"></i> Kategorie</span>
+                <button type="button" class="btn btn-success" data-toggle="modal" onclick="loadPartialView('Create', 0)">
+                    Create
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <table id="datatablesSimple">
+                <thead>
+                    <tr>
+                        <th>
+                            Nazwa
+                        </th>
+                        <th>
+                            Kategoria nadrzędna
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>
+                            Nazwa
+                        </th>
+                        <th>
+                            Kategoria nadrzędna
+                        </th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.title)
+                            </td>
+                            <td>
+                                @if (item.parentId != null)
+                                {
+                                    @WebsiteBlogCMS.Classes.DataHelper.CategoryUtils.GetCategory((int)item.parentId).title
+                                }
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-warning" data-toggle="modal" onclick="loadPartialView('Edit', @item.id)">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn btn-info" data-toggle="modal" onclick="loadPartialView('Detail', @item.id)">
+                                    Detail
+                                </button>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" onclick="loadPartialView('Delete', @item.id)">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div id="myModal">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    jQuery.noConflict(); // Use this only once
+
+    function loadPartialView(operation, id) {
+        var url = '@Url.Action("LoadPartialView", "Category")';
+
+        jQuery.ajax({
+            url: url,
+            type: 'GET',
+            data: { operation: operation, id: id },
+            success: function (data) {
+                $('#myModal').html(data);
+                $('#' + operation + 'Category-' + id).modal('show');
+            },
+            error: function () {
+                alert('Error loading partial view.');
+            }
+        });
+    }
+</script>

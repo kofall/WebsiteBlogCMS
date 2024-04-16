@@ -1,0 +1,36 @@
+﻿@model WebsiteBlogCMS.Models.Validation.PostModel
+
+<div class="modal fade" id="DeletePost-@Model.Id" aria-labelledby="DeletePostLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeletePostLabel">Czy jesteś pewien, że chcesz usunąć ten post?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        Tytuł
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Title)
+                    </dd>
+                </dl>
+                @using (Html.BeginForm("Delete", "Post", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @Html.HiddenFor(model => model.Id)
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                        <button type="submit" value="Delete" class="btn btn-primary">Delete</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

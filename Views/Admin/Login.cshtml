@@ -1,0 +1,33 @@
+﻿@model WebsiteBlogCMS.Models.UserAccount
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/_AccountLayoutPage.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
+                <div class="card-body">
+                    @Html.Partial("../Shared/_Message")
+                    @using (Html.BeginForm("Login", "Admin", FormMethod.Post))
+                    {
+                        <div class="form-floating mb-3">
+                            @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control", placeholder = "Podaj login" } })
+                            <label for="Login">Login</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", type = "password", placeholder = "Podaj hasło" } })
+                            <label for="Password">Hasło</label>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary vw-100">Zaloguj</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,98 @@
+﻿@model WebsiteBlogCMS.Models.Validation.EditSettingsModel
+
+@{
+    Layout = "~/Views/_AdminPanelLayoutPage.cshtml";
+}
+
+<link href="~/css/style-custom.css" rel="stylesheet" />
+
+<div class="container-fluid p-4">
+    <h1 class="mt-4 mb-4">Ustawienia konta</h1>
+    @Html.Partial("../Shared/_Message")
+    <div class="mb-4">
+        @using (Html.BeginForm("EditSettings", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            @Html.HiddenFor(model => model.Login)
+            @Html.HiddenFor(model => model.RoleId)
+            @Html.HiddenFor(model => model.ProfileImage)
+
+            <div class="form-floating mb-3">
+                @Html.EditorFor(model => model.Login, new { htmlAttributes = new { @class = "form-control", placeholder = "sample", @disabled = "disabled" } })
+                <label for="login">Login</label>
+                @Html.ValidationMessageFor(model => model.Login, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                @Html.DropDownListFor(model => model.RoleId, new SelectList(ViewBag.Roles, "id", "name"), "Wybierz rolę", new { @class = "form-control", @disabled = "disabled" })
+                <label asp-for="roleId" class="control-label">Rola</label>
+                @Html.ValidationMessageFor(model => model.RoleId, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                <label for="firstName">Imię</label>
+                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                <label for="lastName">Nazwisko</label>
+                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+            </div>
+
+            <label for="profileImage">Zdjęcie profilowe</label>
+            <div class="form-floating mb-3">
+                @if (Model.ProfileImage != null && Model.ProfileImage.Length > 0)
+                {
+                    <img id="profileImagePreview" src="data:image/*;base64,@(Convert.ToBase64String(Model.ProfileImage))" alt="Image" class="image-preview-sq rounded-circle" />
+                }
+                else
+                {
+                    <img id="profileImagePreview" src="" alt="Image" class="image-preview-sq" />
+                }
+                @Html.TextBoxFor(model => Model.ProfileImage, new { type = "file", @class = "form-control custom-file-input", accept = "image/*", id = "profileImage", name = "profileImage", onchange = "previewImage(this)" })
+                @Html.ValidationMessageFor(model => model.ProfileImage, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                <div class="input-group">
+                    @Html.TextAreaFor(model => model.Intro, new { @class = "form-control", @placeholder = "Krótki opis profilu", @rows = "4" })
+                </div>
+                @Html.ValidationMessageFor(model => model.Intro, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-floating mb-3">
+                <div class="input-group">
+                    @Html.TextAreaFor(model => model.Profile, new { @class = "form-control", @placeholder = "Szczegółowy opis profilu", @rows = "4" })
+                </div>
+                @Html.ValidationMessageFor(model => model.Profile, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Zapisz</button>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function previewImage(input) {
+        var preview = document.getElementById('profileImagePreview');
+        var file = input.files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+    }
+</script>

@@ -50,8 +50,23 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.57.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>packages\HtmlAgilityPack.1.11.57\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data.Linq" />
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
+    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.Linq">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -96,10 +111,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\demo\chart-area-demo.js" />
+    <Content Include="assets\demo\chart-bar-demo.js" />
+    <Content Include="assets\demo\chart-pie-demo.js" />
+    <Content Include="assets\demo\datatables-demo.js" />
+    <Content Include="assets\img\error-404-monochrome.svg" />
     <Content Include="Content\bootstrap-chosen.css" />
     <Content Include="Content\chosen-sprite%402x.png" />
     <Content Include="Content\chosen-sprite.png" />
+    <Content Include="Content\PagedList.css" />
+    <Content Include="css\style-adminpanel.css" />
+    <Content Include="css\style-custom.css" />
     <Content Include="css\style-liberty.css" />
+    <Content Include="css\virtual-select.min.css" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
     <Content Include="images\a1.jpg" />
@@ -138,12 +162,23 @@
     <Content Include="images\trending1.jpg" />
     <Content Include="images\trending2.jpg" />
     <Content Include="js\bootstrap.min.js" />
+    <Content Include="js\datatables-simple-demo.js" />
     <Content Include="js\jquery-3.3.1.min.js" />
     <Content Include="js\owl.carousel.js" />
+    <Content Include="js\scripts.js" />
     <Content Include="js\theme-change.js" />
     <Content Include="Content\bootstrap-chosen.scss" />
     <Content Include="Content\bootstrap-chosen.less" />
+    <Content Include="Data\BlogDB.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>BlogDB.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Data\BlogDB.dbml.layout">
+      <DependentUpon>BlogDB.dbml</DependentUpon>
+    </None>
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
+    <Content Include="js\virtual-select.min.js" />
     <Content Include="Scripts\chosen.jquery.js" />
     <Content Include="Scripts\chosen.jquery.min.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
@@ -152,25 +187,46 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Classes\CryptHelper.cs" />
     <Compile Include="Classes\DbHelper.cs" />
+    <Compile Include="Classes\DataHelper.cs" />
     <Compile Include="Classes\Enums.cs" />
-    <Compile Include="Classes\ProgramVariables.cs" />
+    <Compile Include="Classes\HtmlHelper.cs" />
+    <Compile Include="Classes\TokenService.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PostController.cs" />
+    <Compile Include="Controllers\SliderController.cs" />
     <Compile Include="Controllers\TagController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Data\BlogDB.cs">
       <DependentUpon>BlogDB.dbml</DependentUpon>
-    </Compile>
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Data\BlogDB.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>BlogDB.dbml</DependentUpon>
     </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DropDownItem.cs" />
+    <Compile Include="Models\HomeContent.cs" />
+    <Compile Include="Models\AdminStatistics.cs" />
+    <Compile Include="Models\PickOrderItemViewModel.cs" />
+    <Compile Include="Models\PostDetailsModel.cs" />
+    <Compile Include="Models\PostsOfCategoryModel.cs" />
+    <Compile Include="Models\PostsOfTagModel.cs" />
+    <Compile Include="Models\UserAccount.cs" />
+    <Compile Include="Models\UserDetailsModel.cs" />
+    <Compile Include="Models\Validation\CategoryModel.cs" />
+    <Compile Include="Models\Validation\CommentModel.cs" />
+    <Compile Include="Models\Validation\EditSettingsModel.cs" />
+    <Compile Include="Models\Validation\PostModel.cs" />
+    <Compile Include="Models\Validation\SlideModel.cs" />
+    <Compile Include="Models\Validation\TagModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -180,36 +236,59 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.woff2" />
     <Content Include="fonts\FontAwesome.otf" />
-    <Content Include="Data\BlogDB.dbml">
-      <Generator>MSLinqToSQLGenerator</Generator>
-      <LastGenOutput>BlogDB.designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </Content>
-    <None Include="Data\BlogDB.dbml.layout">
-      <DependentUpon>BlogDB.dbml</DependentUpon>
-    </None>
     <None Include="packages.config" />
-    <Content Include="Views\_LayoutPage1.cshtml" />
+    <Content Include="Views\_BlogLayoutPage.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Category\Index.cshtml" />
-    <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Tag\Index.cshtml" />
-    <Content Include="Views\Post\Index.cshtml" />
-    <Content Include="Views\Category\Create.cshtml" />
-    <Content Include="Views\Category\Delete.cshtml" />
+    <Content Include="Views\Post\PostsOfCategory.cshtml" />
     <Content Include="Views\Category\Details.cshtml" />
-    <Content Include="Views\Category\Edit.cshtml" />
-    <Content Include="Views\Post\Create.cshtml" />
-    <Content Include="Views\Post\Delete.cshtml" />
     <Content Include="Views\Post\Details.cshtml" />
-    <Content Include="Views\Post\Edit.cshtml" />
-    <Content Include="Views\Tag\Create.cshtml" />
-    <Content Include="Views\Tag\Delete.cshtml" />
     <Content Include="Views\Tag\Details.cshtml" />
-    <Content Include="Views\Tag\Edit.cshtml" />
     <Content Include="Views\User\Details.cshtml" />
-    <Content Include="Views\User\Edit.cshtml" />
-    <Content Include="Views\User\Delete.cshtml" />
+    <Content Include="Views\_AdminPanelLayoutPage-WithLiberty.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\Login.cshtml" />
+    <Content Include="Views\Admin\Users.cshtml" />
+    <Content Include="Views\_AccountLayoutPage.cshtml" />
+    <Content Include="Views\_ErrorLayoutPage.cshtml" />
+    <Content Include="Views\Error\401.cshtml" />
+    <Content Include="Views\Error\404.cshtml" />
+    <Content Include="Views\Error\500.cshtml" />
+    <Content Include="Views\Admin\Categories.cshtml" />
+    <Content Include="Views\Admin\Posts.cshtml" />
+    <Content Include="Views\Admin\Tags.cshtml" />
+    <Content Include="Views\User\_DetailUserPartialView.cshtml" />
+    <Content Include="Views\User\_EditUserPartialView.cshtml" />
+    <Content Include="Views\User\_CreateUserPartialView.cshtml" />
+    <Content Include="Views\User\_ActivationLinkPartialView.cshtml" />
+    <Content Include="Views\User\_DeleteUserPartialView.cshtml" />
+    <Content Include="Views\Admin\Activate.cshtml" />
+    <Content Include="Views\Category\_CreateCategoryPartialView.cshtml" />
+    <Content Include="Views\Category\_DeleteCategoryPartialView.cshtml" />
+    <Content Include="Views\Category\_DetailCategoryPartialView.cshtml" />
+    <Content Include="Views\Category\_EditCategoryPartialView.cshtml" />
+    <Content Include="Views\Tag\_CreateTagPartialView.cshtml" />
+    <Content Include="Views\Tag\_DeleteTagPartialView.cshtml" />
+    <Content Include="Views\Tag\_DetailTagPartialView.cshtml" />
+    <Content Include="Views\Tag\_EditTagPartialView.cshtml" />
+    <Content Include="Views\Post\_DeletePostPartialView.cshtml" />
+    <Content Include="Views\Admin\Settings.cshtml" />
+    <Content Include="Views\Post\Create.cshtml" />
+    <Content Include="Views\Post\Edit.cshtml" />
+    <Content Include="Views\Slider\Create.cshtml" />
+    <Content Include="Views\Admin\Sliders.cshtml" />
+    <Content Include="Views\Slider\Edit.cshtml" />
+    <Content Include="Views\Slider\_DetailSliderPartialView.cshtml" />
+    <Content Include="Views\Slider\_DeleteSliderPartialView.cshtml" />
+    <Content Include="Views\Admin\CategoriesPick.cshtml" />
+    <Content Include="Views\Admin\PickPage.cshtml" />
+    <Content Include="Views\Shared\_Message.cshtml" />
+    <Content Include="Views\Post\Preview.cshtml" />
+    <Content Include="Views\Post\PostsOfTag.cshtml" />
+    <Content Include="Views\Home\Categories.cshtml" />
+    <Content Include="Views\Home\Tags.cshtml" />
+    <Content Include="Views\_AdminPanelLayoutPage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -219,7 +298,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />

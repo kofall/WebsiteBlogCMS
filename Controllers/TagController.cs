@@ -1,88 +1,116 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using WebsiteBlogCMS.Classes;
+using WebsiteBlogCMS.Data;
+using WebsiteBlogCMS.Models.Validation;
+using static WebsiteBlogCMS.Classes.DataHelper;
+using static WebsiteBlogCMS.Classes.Enums;
 
 namespace WebsiteBlogCMS.Controllers
 {
     public class TagController : Controller
     {
-        // GET: Tag
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        // GET: Tag/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: Tag/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Tag/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        [Authorize]
+        public ActionResult Create(TagModel model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
+                TempData[Message(MessageType.Warning)] = ModelUtils.GetErrorMessages(ModelState);
+                return RedirectToAction("Tags", "Admin");
             }
-            catch
+
+            using (var ctx = DbHelper.DataContext)
             {
-                return View();
+                Tag tag = new Tag();
+                tag.title = model.Title;
+
+                if (!TagUtils.IsTagValid(ctx, tag))
+                {
+                    TempData[Message(MessageType.Error)] = "Tag o takiej nazwie już istnieje.";
+                    return RedirectToAction("Tags", "Admin");
+                }
+
+                ctx.Tags.InsertOnSubmit(tag);
+                ctx.SubmitChanges();
+
+                TempData[Message(MessageType.Success)] = "Pomyślnie utworzono tag.";
+                return RedirectToAction("Tags", "Admin");
             }
         }
 
-        // GET: Tag/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Tag/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        [Authorize]
+        public ActionResult Edit(TagModel model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                return View("HttpNotFound");
             }
-            catch
+
+            using (var ctx = DbHelper.DataContext)
             {
-                return View();
+                Tag tag = TagUtils.GetTag(ctx, model.Id);
+
+                if (tag == null)
+                {
+                    return View("HttpNotFound");
+                }
+
+                tag.title = model.Title;
+
+                if (!TagUtils.IsTagValid(ctx, tag))
+                {
+                    TempData[Message(MessageType.Warning)] = "Tag o takiej nazwie już istnieje.";
+                    return View("HttpNotFound");
+                }
+
+                ctx.SubmitChanges();
+
+                TempData[Message(MessageType.Success)] = "Pomyślnie zapisano zmiany.";
+                return RedirectToAction("Tags", "Admin");
             }
         }
 
-        // GET: Tag/Delete/5
+        [Authorize]
+        [HttpPost]
         public ActionResult Delete(int id)
         {
-            return View();
+            using (var ctx = DbHelper.DataContext)
+            {
+                Tag tag = TagUtils.GetTag(ctx, id);
+
+                if (tag != null)
+                {
+                    ctx.Tags.DeleteOnSubmit(tag);
+                    ctx.SubmitChanges();
+
+                    TempData[Message(MessageType.Success)] = "Pomyślnie usunięto tag.";
+                }
+                return RedirectToAction("Tags", "Admin");
+            }
         }
 
-        // POST: Tag/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        [Authorize]
+        public ActionResult LoadPartialView(string operation, int id)
         {
-            try
+            using (var ctx = DbHelper.DataContext)
             {
-                // TODO: Add delete logic here
+                TagModel model = new TagModel();
 
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
+                if (operation != "Create")
+                {
+                    Tag tag = TagUtils.GetTag(ctx, id);
+
+                    if (tag == null)
+                    {
+                        return HttpNotFound();
+                    }
+
+                    model.Id = tag.id;
+                    model.Title = tag.title;
+                }
+
+                return PartialView($"_{operation}TagPartialView", model);
             }
         }
     }

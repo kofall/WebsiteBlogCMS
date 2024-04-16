@@ -1,22 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace WebsiteBlogCMS.Classes
 {
-    sealed public class Enums
+    public class Enums
     {
-        public enum DatabaseType
+        public enum MessageType
         {
-            Local,
-            Public
+            Error,
+            Warning,
+            Success
         }
 
-        public enum CompanyType
+        public static string Message(MessageType messageType)
         {
-            Production,
-            Test
+            switch (messageType)
+            {
+                case MessageType.Error:
+                    return "ErrorMessage";
+                case MessageType.Warning:
+                    return "WarningMessage";
+                case MessageType.Success:
+                    return "SuccessMessage";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null);
+            }
         }
     }
 }

@@ -1,0 +1,47 @@
+﻿@model WebsiteBlogCMS.Models.Validation.CategoryModel
+
+<div class="modal fade" id="EditCategory-@Model.Id" aria-labelledby="EditCategoryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditCategoryLabel">Edycja kategorii</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("Edit", "Category", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @Html.HiddenFor(model => model.Id)
+
+                    <div class="form-floating mb-3">
+                        @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", placeholder = "sample" } })
+                        <label for="login">Nazwa</label>
+                        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        @Html.DropDownListFor(model => model.ParentId, new SelectList(ViewBag.Categories, "id", "title"), "Brak", new { @class = "form-control" })
+                        <label asp-for="ParentId">Kategoria nadrzędna (opcjonalne)</label>
+                        @Html.ValidationMessageFor(model => model.ParentId, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <div class="input-group">
+                            @Html.TextAreaFor(model => model.Content, new { @class = "form-control", @placeholder = "Opis", @rows = "4" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Content, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                        <button type="submit" class="btn btn-primary">Zapisz</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
